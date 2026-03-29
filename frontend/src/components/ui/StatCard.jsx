@@ -13,7 +13,7 @@ export const StatCard = ({
   };
 
   return (
-    <div className={`page-section p-5 ${className}`}>
+    <div className={`glass-card p-6 transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-lg ${className}`}>
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm font-medium text-slate-500">{label}</p>

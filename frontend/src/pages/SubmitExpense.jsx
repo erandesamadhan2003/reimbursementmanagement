@@ -81,8 +81,9 @@ export const SubmitExpense = () => {
     `w-full rounded-2xl border ${hasError ? "border-red-300" : "border-slate-200"} bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-4 focus:ring-teal-500/10`;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-start gap-3">
+    <div className="space-y-8">
+      <div className="glass-card p-6 sm:p-8">
+        <div className="flex items-start gap-3">
         <button
           onClick={() => navigate("/dashboard")}
           className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 transition-all hover:bg-slate-50"
@@ -92,17 +93,18 @@ export const SubmitExpense = () => {
         </button>
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-teal-700">Submit expense</p>
-          <h1 className="mt-2 text-[clamp(2.2rem,4vw,4.2rem)] font-extrabold leading-[0.95] text-slate-950">
+          <h1 className="mt-2 max-w-4xl text-[clamp(1.9rem,2.8vw,3.1rem)] font-bold leading-tight text-slate-950">
             Create a new reimbursement request.
           </h1>
-          <p className="mt-3 max-w-3xl text-lg text-slate-600">
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base">
             Fill in the expense details on the left and optionally scan a receipt on the right to auto-fill fields.
           </p>
         </div>
       </div>
+      </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.6fr)_420px]">
-        <div className="page-section p-8">
+      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.45fr)_360px]">
+        <div className="glass-card p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid gap-5 md:grid-cols-2">
               <div className="md:col-span-2">
@@ -178,14 +180,14 @@ export const SubmitExpense = () => {
                   placeholder="Add supporting detail, attendee names, project codes, or business purpose"
                   value={formData.description}
                   onChange={(e) => updateField("description", e.target.value)}
-                  rows={6}
+                  rows={5}
                   className={`${inputClass(false)} resize-y`}
                 />
               </div>
             </div>
 
             <div className="flex flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm text-slate-500">
+              <p className="max-w-xl text-sm text-slate-500">
                 Make sure the title, amount, and date match the receipt before submitting.
               </p>
               <button
@@ -210,9 +212,9 @@ export const SubmitExpense = () => {
         </div>
 
         <div className="space-y-6">
-          <div className="page-section p-6">
-            <h2 className="text-2xl font-bold text-slate-950">Receipt scan</h2>
-            <p className="mt-2 text-base text-slate-500">
+          <div className="glass-card p-6">
+            <h2 className="text-xl font-semibold text-slate-950">Receipt scan</h2>
+            <p className="mt-2 text-sm text-slate-500">
               Upload a receipt image to auto-fill the form details.
             </p>
             <div className="mt-5">
@@ -225,8 +227,8 @@ export const SubmitExpense = () => {
             </div>
           </div>
 
-          <div className="page-section p-6">
-            <h3 className="text-lg font-bold text-slate-950">Tips</h3>
+          <div className="glass-card p-6">
+            <h3 className="text-xl font-semibold text-slate-950">Tips</h3>
             <ul className="mt-3 space-y-2 text-sm text-slate-600">
               <li>Use a short, clear title.</li>
               <li>Upload a flat, readable receipt image.</li>

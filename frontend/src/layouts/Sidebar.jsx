@@ -49,7 +49,7 @@ export const Sidebar = () => {
     <>
       <button
         onClick={() => setMobileOpen(true)}
-        className="fixed left-4 top-4 z-50 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-900 text-white shadow-lg lg:hidden"
+        className="fixed left-4 top-4 z-30 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-900 text-white shadow-lg lg:hidden"
         aria-label="Open sidebar"
       >
         <Menu className="h-5 w-5" />
@@ -64,7 +64,8 @@ export const Sidebar = () => {
 
       <aside
         className={`
-          fixed left-0 top-0 z-50 flex h-screen w-[272px] flex-col border-r border-slate-200 bg-[#0f5c57] text-white
+          fixed left-0 top-0 z-20 flex h-screen w-[240px] flex-col border-r border-teal-900/10
+          bg-gradient-to-b from-[#0f5c57] to-[#114d49] text-white
           transition-transform duration-300 ease-out
           ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
           lg:static lg:translate-x-0
@@ -89,7 +90,11 @@ export const Sidebar = () => {
           </button>
         </div>
 
-        <nav className="flex-1 space-y-1 px-4 py-6">
+        <div className="px-4 pt-5">
+          <div className="h-px bg-white/10" />
+        </div>
+
+        <nav className="flex-1 space-y-2 px-4 py-5">
           {filteredItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
@@ -99,9 +104,9 @@ export const Sidebar = () => {
                 key={item.path}
                 onClick={() => handleNav(item.path)}
                 className={`
-                  flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-base font-semibold transition-all duration-200
+                  flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-[15px] font-semibold transition-all duration-300 ease-out
                   ${active
-                    ? "bg-white text-teal-900 shadow-[0_14px_30px_rgba(8,38,37,0.18)]"
+                    ? "bg-teal-300/18 text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.12)]"
                     : "text-teal-50/92 hover:bg-white/10"
                   }
                 `}

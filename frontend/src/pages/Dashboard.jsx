@@ -88,30 +88,30 @@ export const Dashboard = () => {
   ];
 
   return (
-    <div className="space-y-6">
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,0.9fr)]">
-        <div className="page-section p-8">
+    <div className="space-y-8">
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(320px,0.92fr)]">
+        <div className="glass-card p-8 lg:p-10">
           <p className="text-sm font-semibold uppercase tracking-[0.22em] text-teal-700">
             {greeting}
           </p>
-          <h1 className="mt-3 max-w-3xl text-[clamp(2.25rem,4vw,4.3rem)] font-extrabold leading-[0.95] text-slate-950">
+          <h1 className="mt-3 max-w-3xl text-[clamp(2.2rem,3.3vw,3.9rem)] font-bold leading-tight text-slate-950">
             Welcome back, {user?.fullName?.split(" ")[0] || "there"}.
           </h1>
-          <p className="mt-4 max-w-2xl text-lg text-slate-600">
+          <p className="mt-4 max-w-2xl text-base text-slate-600">
             Track submissions, monitor approvals, and keep reimbursements moving from one clean dashboard.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
             <button
               onClick={() => navigate("/dashboard/submit")}
-              className="inline-flex items-center gap-2 rounded-2xl bg-teal-700 px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-teal-800"
+              className="inline-flex items-center gap-2 rounded-2xl bg-teal-700 px-5 py-3 text-sm font-semibold text-white transition-all duration-300 ease-out hover:-translate-y-0.5 hover:bg-teal-800"
             >
               <PlusCircle className="h-4 w-4" />
               Submit Expense
             </button>
             <button
               onClick={() => setActiveFilter("pending")}
-              className="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-all hover:bg-slate-50"
+              className="rounded-2xl border border-slate-200 bg-white/90 px-5 py-3 text-sm font-semibold text-slate-700 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:bg-slate-50"
             >
               Review Pending
             </button>
@@ -119,12 +119,12 @@ export const Dashboard = () => {
         </div>
 
         <div className="grid gap-4">
-          <div className="page-section p-6">
+          <div className="glass-card p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">This month</p>
             <p className="mt-3 text-5xl font-bold text-slate-950">{expenses.length}</p>
             <p className="mt-2 text-sm text-slate-500">total requests tracked across your workflow</p>
           </div>
-          <div className="page-section p-6">
+          <div className="glass-card p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Approved value</p>
             <p className="mt-3 text-5xl font-bold text-slate-950">
               ${approvedExpenses.reduce((s, e) => s + parseFloat(e.amount || 0), 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
@@ -134,7 +134,7 @@ export const Dashboard = () => {
         </div>
       </section>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <StatCard icon={Receipt} label="Total Expenses" value={expenses.length} />
         <StatCard icon={Clock} label="Pending" value={pendingExpenses.length} accent="amber" />
         <StatCard icon={CheckCircle} label="Approved" value={approvedExpenses.length} accent="green" />
@@ -144,8 +144,8 @@ export const Dashboard = () => {
       <section className="space-y-4">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 className="text-4xl font-bold tracking-tight text-slate-950">Recent expenses</h2>
-            <p className="mt-2 text-base text-slate-500">
+            <h2 className="text-xl font-semibold text-slate-950">Recent expenses</h2>
+            <p className="mt-2 text-sm text-slate-500">
               Filter and review your latest reimbursement activity.
             </p>
           </div>

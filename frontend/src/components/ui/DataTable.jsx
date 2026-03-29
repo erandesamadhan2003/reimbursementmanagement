@@ -11,7 +11,7 @@ export const DataTable = ({
 }) => {
   if (loading) {
     return (
-      <div className="page-section p-12">
+      <div className="glass-card p-12">
         <LoadingSpinner size="md" />
       </div>
     );
@@ -19,14 +19,14 @@ export const DataTable = ({
 
   if (!data || data.length === 0) {
     return (
-      <div className="page-section p-10">
+      <div className="glass-card p-10">
         <EmptyState message={emptyMessage} action={emptyAction} />
       </div>
     );
   }
 
   return (
-    <div className="page-section overflow-hidden">
+    <div className="glass-card overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full min-w-[720px]">
           <thead className="bg-slate-50">

@@ -17,6 +17,8 @@ import {
   CheckCircle,
   XCircle,
   MessageSquare,
+  Receipt,
+  Coins,
 } from "lucide-react";
 
 export const ExpenseDetail = () => {
@@ -73,50 +75,60 @@ export const ExpenseDetail = () => {
 
   const receiptUrl = expense.receipt_url || expense.receiptUrl;
 
-  const metaCards = [
+  const detailCards = [
     {
       icon: DollarSign,
-      label: "Amount",
+      label: "Claim amount",
       value: `${expense.currency || "$"}${parseFloat(expense.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+    },
+    {
+      icon: Coins,
+      label: "Company currency",
+      value: expense.companyCurrency || expense.company_currency || "Default company currency",
     },
     {
       icon: Tag,
       label: "Category",
-      value: expense.category || "—",
+      value: expense.category || "Uncategorized",
     },
     {
       icon: Calendar,
-      label: "Date",
+      label: "Expense date",
       value: expense.date
         ? new Date(expense.date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
-        : "—",
+        : "Not provided",
     },
     {
       icon: User,
-      label: "Submitted By",
+      label: "Submitted by",
       value: expense.user?.fullName || expense.submitter_name || "Employee",
+    },
+    {
+      icon: Receipt,
+      label: "Current status",
+      value: expense.status || "pending",
     },
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           <button
             onClick={() => navigate(-1)}
-            className="rounded-2xl border border-beige-200 bg-white/70 p-3 transition-all hover:bg-white"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 transition-all hover:bg-slate-50"
             aria-label="Go back"
           >
-            <ArrowLeft className="h-5 w-5 text-teal-700" />
+            <ArrowLeft className="h-5 w-5" />
           </button>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-400">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-teal-700">
               Expense detail
             </p>
-            <h1 className="mt-2 text-teal-950">
-              {expense.title || expense.description || "Expense Detail"}
+            <h1 className="mt-2 text-3xl font-bold text-slate-950 sm:text-4xl">
+              {expense.title || expense.description || "Expense request"}
             </h1>
-            <p className="mt-2 text-sm text-teal-500">
+            <p className="mt-2 text-sm text-slate-500">
               Reference ID: {expense._id?.slice(-8)}
             </p>
           </div>
@@ -124,24 +136,28 @@ export const ExpenseDetail = () => {
         <StatusBadge status={expense.status} size="md" />
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.9fr)]">
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_380px]">
         <div className="space-y-6">
-          <div className="page-section p-5 sm:p-7 animate-fade-in-up">
-            <h2 className="text-teal-950">Expense information</h2>
-            <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              {metaCards.map((item) => {
+          <div className="glass-card p-6 sm:p-8">
+            <h2 className="text-xl font-semibold text-slate-950">Expense overview</h2>
+            <p className="mt-2 text-sm text-slate-500">
+              Review the submitted reimbursement details, employee context, and supporting information before taking action.
+            </p>
+
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              {detailCards.map((item) => {
                 const Icon = item.icon;
                 return (
-                  <div key={item.label} className="rounded-2xl border border-beige-100 bg-white/72 p-4">
+                  <div key={item.label} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                     <div className="flex items-start gap-3">
-                      <div className="rounded-xl bg-teal-50 p-2.5">
-                        <Icon className="h-4 w-4 text-teal-500" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-teal-700">
+                        <Icon className="h-4 w-4" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">
+                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
                           {item.label}
                         </p>
-                        <p className="mt-1 break-words text-sm font-semibold capitalize text-teal-900 sm:text-base">
+                        <p className="mt-1 break-words text-sm font-semibold capitalize text-slate-900">
                           {item.value}
                         </p>
                       </div>
@@ -152,16 +168,16 @@ export const ExpenseDetail = () => {
             </div>
 
             {expense.description && (
-              <div className="mt-5 border-t border-beige-100 pt-5">
+              <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
                 <div className="flex items-start gap-3">
-                  <div className="rounded-xl bg-teal-50 p-2.5">
-                    <FileText className="h-4 w-4 text-teal-500" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-50 text-teal-700">
+                    <FileText className="h-4 w-4" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
                       Description
                     </p>
-                    <p className="mt-2 text-sm text-teal-700 sm:text-base">{expense.description}</p>
+                    <p className="mt-2 text-sm leading-7 text-slate-600">{expense.description}</p>
                   </div>
                 </div>
               </div>
@@ -169,13 +185,13 @@ export const ExpenseDetail = () => {
           </div>
 
           {receiptUrl && (
-            <div className="page-section p-5 sm:p-7 animate-fade-in-up" style={{ animationDelay: "80ms" }}>
+            <div className="glass-card p-6 sm:p-8">
               <div className="mb-4 flex items-center gap-2">
-                <Image className="h-5 w-5 text-teal-500" />
-                <h2 className="text-teal-950">Receipt</h2>
+                <Image className="h-5 w-5 text-teal-700" />
+                <h2 className="text-xl font-semibold text-slate-950">Receipt attachment</h2>
               </div>
               <div
-                className="overflow-hidden rounded-[1.5rem] border border-beige-200 bg-beige-50 transition-all hover:shadow-lg cursor-pointer"
+                className="cursor-pointer overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 transition-all hover:shadow-md"
                 onClick={() => setLightboxOpen(true)}
               >
                 <img
@@ -188,45 +204,45 @@ export const ExpenseDetail = () => {
           )}
 
           {canApprove && (
-            <div className="page-section p-5 sm:p-7 animate-fade-in-up" style={{ animationDelay: "120ms" }}>
-              <h2 className="text-teal-950">Approval action</h2>
-              <p className="mt-2 text-sm text-teal-500">
-                Approve immediately or leave a clear rejection note for the submitter.
+            <div className="glass-card p-6 sm:p-8">
+              <h2 className="text-xl font-semibold text-slate-950">Manager or admin action</h2>
+              <p className="mt-2 text-sm text-slate-500">
+                Approve to move the request forward in sequence, or reject with a comment so the employee can revise it.
               </p>
 
               {!showRejectInput ? (
-                <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+                <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                   <button
                     onClick={handleApprove}
                     disabled={actionLoading}
-                    className="flex-1 rounded-2xl bg-green-500 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-green-600 disabled:bg-green-300"
+                    className="flex-1 rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-emerald-700 disabled:bg-emerald-300"
                   >
                     <span className="inline-flex items-center gap-2">
                       <CheckCircle className="h-4 w-4" />
-                      Approve
+                      Approve and continue flow
                     </span>
                   </button>
                   <button
                     onClick={() => setShowRejectInput(true)}
                     disabled={actionLoading}
-                    className="flex-1 rounded-2xl bg-red-500 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-red-600 disabled:bg-red-300"
+                    className="flex-1 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 transition-all hover:bg-red-100 disabled:opacity-50"
                   >
                     <span className="inline-flex items-center gap-2">
                       <XCircle className="h-4 w-4" />
-                      Reject
+                      Reject with comment
                     </span>
                   </button>
                 </div>
               ) : (
-                <div className="mt-5 space-y-3 animate-slide-up">
+                <div className="mt-5 space-y-3">
                   <div className="relative">
-                    <MessageSquare className="absolute left-3 top-3 h-4 w-4 text-teal-400" />
+                    <MessageSquare className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                     <textarea
                       value={rejectComment}
                       onChange={(e) => setRejectComment(e.target.value)}
-                      placeholder="Reason for rejection..."
+                      placeholder="Explain why this claim is being rejected..."
                       rows={4}
-                      className="w-full resize-none rounded-2xl border border-beige-200 bg-white/80 py-3 pl-10 pr-4 text-sm text-teal-900 placeholder:text-teal-300 transition-all focus:border-teal-500 focus:outline-none focus:ring-4 focus:ring-teal-500/12"
+                      className="w-full resize-none rounded-2xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-4 focus:ring-teal-500/10"
                       autoFocus
                       aria-label="Rejection reason"
                     />
@@ -234,16 +250,16 @@ export const ExpenseDetail = () => {
                   <div className="flex flex-col gap-3 sm:flex-row">
                     <button
                       onClick={() => { setShowRejectInput(false); setRejectComment(""); }}
-                      className="flex-1 rounded-2xl border border-beige-200 px-4 py-3 text-sm font-medium text-teal-700 transition-colors hover:bg-beige-100"
+                      className="flex-1 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleReject}
                       disabled={!rejectComment.trim() || actionLoading}
-                      className="flex-1 rounded-2xl bg-red-500 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-red-600 disabled:bg-red-300"
+                      className="flex-1 rounded-2xl bg-red-600 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-red-700 disabled:bg-red-300"
                     >
-                      {actionLoading ? "Rejecting..." : "Confirm Rejection"}
+                      {actionLoading ? "Rejecting..." : "Confirm rejection"}
                     </button>
                   </div>
                 </div>
@@ -252,20 +268,26 @@ export const ExpenseDetail = () => {
           )}
         </div>
 
-        <div className="page-section p-5 sm:p-7 animate-fade-in-up" style={{ animationDelay: "100ms" }}>
-          <h2 className="text-teal-950">Approval timeline</h2>
-          <div className="mt-5">
-            <ApprovalTimeline approvalLogs={expense.approval_logs || expense.approvalLogs || []} />
+        <div className="glass-card p-6 sm:p-8">
+          <h2 className="text-xl font-semibold text-slate-950">Approval workflow</h2>
+          <p className="mt-2 text-sm text-slate-500">
+            Follow each stage of the reimbursement process, including sequence-based approvals and any conditional outcome logic.
+          </p>
+          <div className="mt-6">
+            <ApprovalTimeline
+              approvalLogs={expense.approval_logs || expense.approvalLogs || []}
+              currentStep={expense.currentStep || expense.current_step}
+            />
           </div>
         </div>
-      </div>
+      </section>
 
       {lightboxOpen && receiptUrl && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm"
           onClick={() => setLightboxOpen(false)}
         >
-          <div className="max-h-[90vh] max-w-4xl animate-scale-in" onClick={(e) => e.stopPropagation()}>
+          <div className="max-h-[90vh] max-w-4xl" onClick={(e) => e.stopPropagation()}>
             <img
               src={receiptUrl}
               alt="Receipt Full View"

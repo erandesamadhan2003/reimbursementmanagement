@@ -1,1 +1,3 @@
 /* App-level overrides — kept minimal, theme lives in index.css */
+@import "tailwindcss";
+@import "tw-animate-css";

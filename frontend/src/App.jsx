@@ -17,6 +17,7 @@ const SubmitExpense = lazy(() => import("@/pages/SubmitExpense").then((m) => ({ 
 const ExpenseDetail = lazy(() => import("@/pages/ExpenseDetail").then((m) => ({ default: m.ExpenseDetail })));
 const ManagerDashboard = lazy(() => import("@/pages/ManagerDashboard").then((m) => ({ default: m.ManagerDashboard })));
 const AdminDashboard = lazy(() => import("@/pages/AdminDashboard").then((m) => ({ default: m.AdminDashboard })));
+const Settings = lazy(() => import("@/pages/Settings").then((m) => ({ default: m.Settings })));
 
 // Route guards
 const ProtectedRoute = ({ children }) => {
@@ -159,13 +160,9 @@ const Router = createBrowserRouter([
       {
         path: "settings",
         element: (
-          <div className="page-section p-8">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-teal-700">Settings</p>
-            <h1 className="mt-3 text-5xl font-extrabold tracking-tight text-slate-950">Workspace settings</h1>
-            <p className="mt-3 max-w-2xl text-lg text-slate-600">
-              Settings are not wired up yet, but this space is now ready for profile, policy, notification, and reimbursement preference controls.
-            </p>
-          </div>
+          <SuspenseWrapper>
+            <Settings />
+          </SuspenseWrapper>
         ),
       },
     ],
