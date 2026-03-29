@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useExpenses } from "@/hooks/useExpenses";
+import { formatCurrency } from "@/utils/currency";
 import { StatCard } from "@/components/ui/StatCard";
 import { DataTable } from "@/components/ui/DataTable";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -60,10 +61,7 @@ export const Dashboard = () => {
       label: "Amount",
       render: (val, row) => (
         <span className="font-semibold text-slate-900">
-          {row.currency || "$"}
-          {parseFloat(val || 0).toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-          })}
+          {formatCurrency(row.amount, row.currency || user?.company?.currency || "USD")}
         </span>
       ),
     },
@@ -127,7 +125,10 @@ export const Dashboard = () => {
           <div className="glass-card p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Approved value</p>
             <p className="mt-3 text-5xl font-bold text-slate-950">
-              ${approvedExpenses.reduce((s, e) => s + parseFloat(e.amount || 0), 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              {formatCurrency(
+                approvedExpenses.reduce((s, e) => s + parseFloat(e.amount || 0), 0),
+                user?.company?.currency || "USD"
+              )}
             </p>
             <p className="mt-2 text-sm text-slate-500">reimbursed across approved expenses</p>
           </div>

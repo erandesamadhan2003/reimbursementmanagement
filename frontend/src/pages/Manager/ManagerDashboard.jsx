@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useExpenses } from "@/hooks/useExpenses";
+import { formatCurrency } from "@/utils/currency";
 import { StatCard } from "@/components/ui/StatCard";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
@@ -37,7 +38,7 @@ const QuickAction = ({ icon: Icon, label, desc, path, color }) => {
   );
 };
 
-const PendingRow = ({ expense, navigate }) => (
+const PendingRow = ({ expense, navigate, userCurrency }) => (
   <tr
     className="border-b border-beige-100 hover:bg-beige-50/50 transition-colors cursor-pointer"
     onClick={() => navigate(`/manager/approvals`)}
@@ -51,7 +52,7 @@ const PendingRow = ({ expense, navigate }) => (
       </div>
     </td>
     <td className="py-3 px-4 text-sm font-semibold text-teal-900">
-      {expense.currency || "₹"}{parseFloat(expense.amount || 0).toLocaleString()}
+      {formatCurrency(expense.amount, expense.currency || userCurrency || "USD")}
     </td>
     <td className="py-3 px-4">
       <StatusBadge status={expense.status} />
@@ -133,7 +134,7 @@ export const ManagerDashboard = () => {
                 <span className="text-xs font-semibold text-teal-300 uppercase tracking-wide">Total Volume</span>
               </div>
               <p className="text-3xl font-extrabold tracking-tight">
-                ₹{totalAmount.toLocaleString()}
+                {formatCurrency(totalAmount, user?.company?.currency || "USD")}
               </p>
               <p className="text-xs text-teal-400 mt-1">{expenses.length} expenses submitted</p>
             </div>
@@ -143,7 +144,7 @@ export const ManagerDashboard = () => {
                 <span className="text-xs font-semibold text-amber-100 uppercase tracking-wide">Awaiting Your Action</span>
               </div>
               <p className="text-3xl font-extrabold tracking-tight">
-                ₹{pendingAmount.toLocaleString()}
+                {formatCurrency(pendingAmount, user?.company?.currency || "USD")}
               </p>
               <p className="text-xs text-amber-100/80 mt-1">{pendingExpenses.length} pending approvals</p>
             </div>
@@ -179,7 +180,7 @@ export const ManagerDashboard = () => {
                   </thead>
                   <tbody>
                     {recentPending.map((exp) => (
-                      <PendingRow key={exp._id} expense={exp} navigate={navigate} />
+                      <PendingRow key={exp._id} expense={exp} navigate={navigate} userCurrency={user?.company?.currency} />
                     ))}
                   </tbody>
                 </table>

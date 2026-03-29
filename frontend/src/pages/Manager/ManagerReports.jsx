@@ -1,5 +1,7 @@
 import { useExpenses } from "@/hooks/useExpenses";
 import { useAnalytics } from "@/hooks/useAnalytics";
+import { useAuth } from "@/hooks/useAuth";
+import { formatCurrency } from "@/utils/currency";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { StatCard } from "@/components/ui/StatCard";
 import {
@@ -27,7 +29,7 @@ const CATEGORY_PALETTE = {
   other: { bg: "bg-beige-100", bar: "bg-teal-300", text: "text-teal-500", border: "border-beige-200" },
 };
 
-const CategoryBar = ({ category, total_amount, count, approved_count, pending_count, maxAmount }) => {
+const CategoryBar = ({ category, total_amount, count, approved_count, pending_count, maxAmount, currency }) => {
   const palette = CATEGORY_PALETTE[category] || CATEGORY_PALETTE.other;
   const widthPct = maxAmount > 0 ? Math.max(4, Math.round((total_amount / maxAmount) * 100)) : 4;
   const approvalPct = count > 0 ? Math.round((approved_count / count) * 100) : 0;
@@ -39,7 +41,7 @@ const CategoryBar = ({ category, total_amount, count, approved_count, pending_co
           <span className={`text-sm font-bold capitalize ${palette.text}`}>{category}</span>
           <span className="text-xs text-teal-400">{count} expenses</span>
         </div>
-        <span className="text-sm font-bold text-teal-900">₹{(total_amount || 0).toLocaleString()}</span>
+        <span className="text-sm font-bold text-teal-900">{formatCurrency(total_amount || 0, currency)}</span>
       </div>
       <div className="h-3 bg-white/60 rounded-full overflow-hidden mb-2">
         <div
@@ -61,9 +63,11 @@ const CategoryBar = ({ category, total_amount, count, approved_count, pending_co
 };
 
 export const ManagerReports = () => {
+  const { user } = useAuth();
   const { summary, byCategory, loading: analyticsLoading, refetchAll } = useAnalytics();
   const { expenses, pendingExpenses, approvedExpenses, rejectedExpenses, loading: expLoading } = useExpenses();
 
+  const currency = user?.company?.currency || "USD";
   const loading = analyticsLoading || expLoading;
   const maxAmount = byCategory?.reduce((max, cat) => Math.max(max, cat.total_amount || 0), 0) || 1;
   const totalSpend = (summary?.total_approved_amount || 0) + (summary?.total_pending_amount || 0);
@@ -112,8 +116,8 @@ export const ManagerReports = () => {
                 </div>
                 <span className="text-xs font-semibold text-teal-500 uppercase tracking-wide">Approved Value</span>
               </div>
-              <p className="text-2xl font-extrabold text-teal-900 tracking-tight">
-                ₹{(summary?.total_approved_amount || 0).toLocaleString()}
+              <p className="mt-3 text-4xl font-extrabold text-teal-950">
+                {formatCurrency(summary?.total_approved_amount || 0, currency)}
               </p>
               <p className="text-xs text-teal-400 mt-1">{summary?.count_approved || approvedExpenses.length} expenses paid out</p>
               <div className="mt-3 h-1.5 bg-beige-100 rounded-full overflow-hidden">
@@ -131,8 +135,8 @@ export const ManagerReports = () => {
                 </div>
                 <span className="text-xs font-semibold text-teal-500 uppercase tracking-wide">Pending Value</span>
               </div>
-              <p className="text-2xl font-extrabold text-teal-900 tracking-tight">
-                ₹{(summary?.total_pending_amount || 0).toLocaleString()}
+              <p className="mt-3 text-4xl font-extrabold text-amber-600">
+                {formatCurrency(summary?.total_pending_amount || 0, currency)}
               </p>
               <p className="text-xs text-teal-400 mt-1">{summary?.count_pending || pendingExpenses.length} awaiting review</p>
               <div className="mt-3 h-1.5 bg-beige-100 rounded-full overflow-hidden">

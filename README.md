@@ -31,7 +31,12 @@ This application is split into two parts: a Node.js/Express `backend` and a Vite
 3. Set up your environment variables:
    - Create a `.env` file in the `backend/` directory based on `.env.example`.
    - Make sure your MongoDB URI (`MONGO_URI`) and JWT Secret (`JWT_SECRET`) are configured.
-4. Start the server (runs on port 5000 by default):
+4. **OPTIONAL BUT RECOMMENDED**: Seed the database with 100+ realistic expenses and test users to properly test the application:
+   ```bash
+   npm run seed
+   ```
+   *Login credentials for the seeded admin will be printed in the console.*
+5. Start the server (runs on port 5000 by default):
    ```bash
    npm run dev
    ```

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useExpenses } from "@/hooks/useExpenses";
+import { useAuth } from "@/hooks/useAuth";
+import { formatCurrency } from "@/utils/currency";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import {
@@ -23,6 +25,7 @@ const GlassCard = ({ children, className = "" }) => (
 const ApprovalModal = ({ expense, onClose, onApprove, onReject, processing }) => {
   const [comment, setComment] = useState("");
   const [action, setAction] = useState(null);
+  const { user } = useAuth();
 
   const handleSubmit = () => {
     if (action === "approve") onApprove(expense._id, comment);
@@ -43,8 +46,8 @@ const ApprovalModal = ({ expense, onClose, onApprove, onReject, processing }) =>
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-white/60 rounded-2xl p-4">
               <p className="text-xs text-teal-500 uppercase tracking-wide font-semibold mb-1">Amount</p>
-              <p className="text-xl font-extrabold text-teal-900">
-                {expense.currency || "₹"}{parseFloat(expense.amount || 0).toLocaleString()}
+              <p className="text-base font-bold text-teal-900 truncate">
+                {formatCurrency(expense.amount, expense.currency || user?.company?.currency || "USD")}
               </p>
             </div>
             <div className="bg-white/60 rounded-2xl p-4">
@@ -118,6 +121,7 @@ const ApprovalModal = ({ expense, onClose, onApprove, onReject, processing }) =>
 
 export const ManagerApprovals = () => {
   const { expenses, pendingExpenses, loading, approve, reject, refetch } = useExpenses();
+  const { user } = useAuth();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("pending");
   const [selectedExpense, setSelectedExpense] = useState(null);
@@ -259,8 +263,8 @@ export const ManagerApprovals = () => {
                         </p>
                         <p className="text-xs text-teal-400 capitalize">{expense.category}</p>
                       </td>
-                      <td className="py-3.5 px-5 text-sm font-bold text-teal-900">
-                        {expense.currency || "₹"}{parseFloat(expense.amount || 0).toLocaleString()}
+                      <td className="py-3 px-4 text-sm font-semibold text-teal-900">
+                        {formatCurrency(expense.amount, expense.currency || user?.company?.currency || "USD")}
                       </td>
                       <td className="py-3.5 px-5">
                         <StatusBadge status={expense.status} />

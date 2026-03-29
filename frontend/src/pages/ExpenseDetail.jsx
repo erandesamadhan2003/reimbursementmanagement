@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { formatCurrency } from "@/utils/currency";
 import { useExpenses } from "@/hooks/useExpenses";
 import { useAuth } from "@/hooks/useAuth";
 import { ApprovalTimeline } from "@/components/ApprovalTimeline";
@@ -78,8 +79,8 @@ export const ExpenseDetail = () => {
   const detailCards = [
     {
       icon: DollarSign,
-      label: "Claim amount",
-      value: `${expense.currency || "$"}${parseFloat(expense.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+      label: "Amount",
+      value: formatCurrency(expense.amount, expense.currency || expense.employee_id?.company?.currency || "USD"),
     },
     {
       icon: Coins,

@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useExpenses } from "@/hooks/useExpenses";
 import { useUsers } from "@/hooks/useUser";
+import { formatCurrency } from "@/utils/currency";
 import { StatCard } from "@/components/ui/StatCard";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
@@ -20,7 +21,7 @@ const CATEGORY_COLORS = {
   other: "#A8D1CE",
 };
 
-const CategoryBar = ({ category, total_amount, count, approved_count, pending_count }) => {
+const CategoryBar = ({ category, total_amount, count, approved_count, pending_count, user }) => {
   const max = total_amount || 1;
   const pct = Math.min(100, Math.round((approved_count / Math.max(count, 1)) * 100));
   return (
@@ -29,7 +30,7 @@ const CategoryBar = ({ category, total_amount, count, approved_count, pending_co
         <span className="text-sm font-semibold capitalize text-teal-800">{category}</span>
         <div className="flex items-center gap-3">
           <span className="text-xs text-teal-500">{count} expenses</span>
-          <span className="text-sm font-bold text-teal-900">₹{(total_amount || 0).toLocaleString()}</span>
+          <span className="text-sm font-bold text-teal-900">{formatCurrency(total_amount || 0, user?.company?.currency || "USD")}</span>
         </div>
       </div>
       <div className="h-2.5 bg-beige-100 rounded-full overflow-hidden">
@@ -81,7 +82,7 @@ const RecentExpenseRow = ({ expense, navigate }) => (
       </div>
     </td>
     <td className="py-3 px-4 text-sm font-semibold text-teal-900">
-      {expense.currency}{parseFloat(expense.amount || 0).toLocaleString()}
+      {formatCurrency(expense.amount || 0, expense.currency)}
     </td>
     <td className="py-3 px-4"><StatusBadge status={expense.status} /></td>
     <td className="py-3 px-4 text-xs text-teal-500">
@@ -176,8 +177,8 @@ export const AdminDashboard = () => {
                 <TrendingUp className="w-4 h-4 text-teal-300" />
                 <span className="text-xs font-semibold text-teal-300 uppercase tracking-wide">Total Approved Value</span>
               </div>
-              <p className="text-3xl font-extrabold tracking-tight">
-                ₹{(summary?.total_approved_amount || 0).toLocaleString()}
+              <p className="mt-3 text-4xl font-extrabold text-white">
+                {formatCurrency(summary?.total_approved_amount || 0, user?.company?.currency || "USD")}
               </p>
               <p className="text-xs text-teal-400 mt-1">{summary?.count_approved || 0} expenses paid out</p>
             </div>
@@ -186,8 +187,8 @@ export const AdminDashboard = () => {
                 <AlertTriangle className="w-4 h-4 text-orange-100" />
                 <span className="text-xs font-semibold text-orange-100 uppercase tracking-wide">Pending Amount</span>
               </div>
-              <p className="text-3xl font-extrabold tracking-tight">
-                ₹{(summary?.total_pending_amount || 0).toLocaleString()}
+              <p className="mt-3 text-4xl font-extrabold text-white">
+                {formatCurrency(summary?.total_pending_amount || 0, user?.company?.currency || "USD")}
               </p>
               <p className="text-xs text-orange-100/80 mt-1">Awaiting your team's action</p>
             </div>
