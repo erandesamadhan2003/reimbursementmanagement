@@ -7,18 +7,18 @@ export const EmptyState = ({
   icon: Icon = Inbox,
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center py-12 text-center animate-fade-in">
-      <div className="w-16 h-16 rounded-full bg-beige-100 flex items-center justify-center mb-4">
-        <Icon className="w-8 h-8 text-teal-400" />
+    <div className="flex flex-col items-center justify-center py-10 text-center">
+      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100">
+        <Icon className="h-7 w-7 text-slate-500" />
       </div>
-      <h3 className="text-lg font-semibold text-teal-900 mb-1">{message}</h3>
+      <h3 className="text-2xl font-bold text-slate-900">{message}</h3>
       {description && (
-        <p className="text-sm text-teal-500 max-w-sm mb-4">{description}</p>
+        <p className="mt-2 max-w-md text-sm text-slate-500">{description}</p>
       )}
       {action && (
         <button
           onClick={action.onClick}
-          className="px-5 py-2 text-sm font-semibold text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-all shadow-sm hover:shadow-md"
+          className="mt-5 rounded-2xl bg-teal-700 px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-teal-800"
         >
           {action.label}
         </button>

@@ -48,7 +48,7 @@ export const ExpenseDetail = () => {
       await approve(expense._id);
       toast.success("Expense approved!");
       loadExpense(id);
-    } catch (err) {
+    } catch {
       toast.error("Failed to approve");
     } finally {
       setActionLoading(false);
@@ -64,7 +64,7 @@ export const ExpenseDetail = () => {
       setShowRejectInput(false);
       setRejectComment("");
       loadExpense(id);
-    } catch (err) {
+    } catch {
       toast.error("Failed to reject");
     } finally {
       setActionLoading(false);
@@ -73,170 +73,175 @@ export const ExpenseDetail = () => {
 
   const receiptUrl = expense.receipt_url || expense.receiptUrl;
 
+  const metaCards = [
+    {
+      icon: DollarSign,
+      label: "Amount",
+      value: `${expense.currency || "$"}${parseFloat(expense.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+    },
+    {
+      icon: Tag,
+      label: "Category",
+      value: expense.category || "—",
+    },
+    {
+      icon: Calendar,
+      label: "Date",
+      value: expense.date
+        ? new Date(expense.date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+        : "—",
+    },
+    {
+      icon: User,
+      label: "Submitted By",
+      value: expense.user?.fullName || expense.submitter_name || "Employee",
+    },
+  ];
+
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 rounded-lg hover:bg-beige-100 transition-colors"
+            className="rounded-2xl border border-beige-200 bg-white/70 p-3 transition-all hover:bg-white"
             aria-label="Go back"
           >
-            <ArrowLeft className="w-5 h-5 text-teal-700" />
+            <ArrowLeft className="h-5 w-5 text-teal-700" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-teal-900">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-400">
+              Expense detail
+            </p>
+            <h1 className="mt-2 text-teal-950">
               {expense.title || expense.description || "Expense Detail"}
             </h1>
-            <p className="text-sm text-teal-500 mt-0.5">
-              ID: {expense._id?.slice(-8)}
+            <p className="mt-2 text-sm text-teal-500">
+              Reference ID: {expense._id?.slice(-8)}
             </p>
           </div>
         </div>
-        <StatusBadge status={expense.status} />
+        <StatusBadge status={expense.status} size="md" />
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Main Info */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Expense Info Card */}
-          <div className="bg-white rounded-xl border border-beige-200 p-6 animate-slide-up">
-            <h2 className="text-lg font-bold text-teal-900 mb-4">Expense Information</h2>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div className="flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-teal-50">
-                  <DollarSign className="w-4 h-4 text-teal-500" />
-                </div>
-                <div>
-                  <p className="text-xs text-teal-500">Amount</p>
-                  <p className="text-lg font-bold text-teal-900">
-                    {expense.currency || "$"}{parseFloat(expense.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-teal-50">
-                  <Tag className="w-4 h-4 text-teal-500" />
-                </div>
-                <div>
-                  <p className="text-xs text-teal-500">Category</p>
-                  <p className="text-sm font-medium text-teal-900 capitalize">{expense.category || "—"}</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-teal-50">
-                  <Calendar className="w-4 h-4 text-teal-500" />
-                </div>
-                <div>
-                  <p className="text-xs text-teal-500">Date</p>
-                  <p className="text-sm font-medium text-teal-900">
-                    {expense.date
-                      ? new Date(expense.date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
-                      : "—"}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-teal-50">
-                  <User className="w-4 h-4 text-teal-500" />
-                </div>
-                <div>
-                  <p className="text-xs text-teal-500">Submitted By</p>
-                  <p className="text-sm font-medium text-teal-900">
-                    {expense.user?.fullName || expense.submitter_name || "Employee"}
-                  </p>
-                </div>
-              </div>
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.9fr)]">
+        <div className="space-y-6">
+          <div className="page-section p-5 sm:p-7 animate-fade-in-up">
+            <h2 className="text-teal-950">Expense information</h2>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              {metaCards.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div key={item.label} className="rounded-2xl border border-beige-100 bg-white/72 p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="rounded-xl bg-teal-50 p-2.5">
+                        <Icon className="h-4 w-4 text-teal-500" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">
+                          {item.label}
+                        </p>
+                        <p className="mt-1 break-words text-sm font-semibold capitalize text-teal-900 sm:text-base">
+                          {item.value}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
             {expense.description && (
-              <div className="mt-4 pt-4 border-t border-beige-100">
+              <div className="mt-5 border-t border-beige-100 pt-5">
                 <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-lg bg-teal-50">
-                    <FileText className="w-4 h-4 text-teal-500" />
+                  <div className="rounded-xl bg-teal-50 p-2.5">
+                    <FileText className="h-4 w-4 text-teal-500" />
                   </div>
                   <div>
-                    <p className="text-xs text-teal-500">Description</p>
-                    <p className="text-sm text-teal-800 mt-1">{expense.description}</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">
+                      Description
+                    </p>
+                    <p className="mt-2 text-sm text-teal-700 sm:text-base">{expense.description}</p>
                   </div>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Receipt Preview */}
           {receiptUrl && (
-            <div className="bg-white rounded-xl border border-beige-200 p-6 animate-slide-up" style={{ animationDelay: "100ms" }}>
-              <div className="flex items-center gap-2 mb-4">
-                <Image className="w-5 h-5 text-teal-500" />
-                <h2 className="text-lg font-bold text-teal-900">Receipt</h2>
+            <div className="page-section p-5 sm:p-7 animate-fade-in-up" style={{ animationDelay: "80ms" }}>
+              <div className="mb-4 flex items-center gap-2">
+                <Image className="h-5 w-5 text-teal-500" />
+                <h2 className="text-teal-950">Receipt</h2>
               </div>
               <div
-                className="rounded-lg overflow-hidden border border-beige-200 bg-beige-50 cursor-pointer hover:shadow-md transition-all"
+                className="overflow-hidden rounded-[1.5rem] border border-beige-200 bg-beige-50 transition-all hover:shadow-lg cursor-pointer"
                 onClick={() => setLightboxOpen(true)}
               >
                 <img
                   src={receiptUrl}
                   alt="Receipt"
-                  className="w-full max-h-80 object-contain"
+                  className="max-h-[28rem] w-full object-contain"
                 />
               </div>
             </div>
           )}
 
-          {/* Approve / Reject Actions */}
           {canApprove && (
-            <div className="bg-white rounded-xl border border-beige-200 p-6 animate-slide-up" style={{ animationDelay: "200ms" }}>
-              <h2 className="text-lg font-bold text-teal-900 mb-4">Actions</h2>
+            <div className="page-section p-5 sm:p-7 animate-fade-in-up" style={{ animationDelay: "120ms" }}>
+              <h2 className="text-teal-950">Approval action</h2>
+              <p className="mt-2 text-sm text-teal-500">
+                Approve immediately or leave a clear rejection note for the submitter.
+              </p>
 
               {!showRejectInput ? (
-                <div className="flex gap-3">
+                <div className="mt-5 flex flex-col gap-3 sm:flex-row">
                   <button
                     onClick={handleApprove}
                     disabled={actionLoading}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-semibold text-white bg-green-500 hover:bg-green-600 disabled:bg-green-300 rounded-lg transition-all"
+                    className="flex-1 rounded-2xl bg-green-500 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-green-600 disabled:bg-green-300"
                   >
-                    <CheckCircle className="w-4 h-4" />
-                    Approve
+                    <span className="inline-flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4" />
+                      Approve
+                    </span>
                   </button>
                   <button
                     onClick={() => setShowRejectInput(true)}
                     disabled={actionLoading}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 disabled:bg-red-300 rounded-lg transition-all"
+                    className="flex-1 rounded-2xl bg-red-500 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-red-600 disabled:bg-red-300"
                   >
-                    <XCircle className="w-4 h-4" />
-                    Reject
+                    <span className="inline-flex items-center gap-2">
+                      <XCircle className="h-4 w-4" />
+                      Reject
+                    </span>
                   </button>
                 </div>
               ) : (
-                <div className="space-y-3 animate-slide-up">
+                <div className="mt-5 space-y-3 animate-slide-up">
                   <div className="relative">
-                    <MessageSquare className="absolute left-3 top-3 w-4 h-4 text-teal-400" />
+                    <MessageSquare className="absolute left-3 top-3 h-4 w-4 text-teal-400" />
                     <textarea
                       value={rejectComment}
                       onChange={(e) => setRejectComment(e.target.value)}
                       placeholder="Reason for rejection..."
-                      rows={3}
-                      className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-beige-200 bg-beige-50/50 text-sm text-teal-900 placeholder:text-teal-300 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all resize-none"
+                      rows={4}
+                      className="w-full resize-none rounded-2xl border border-beige-200 bg-white/80 py-3 pl-10 pr-4 text-sm text-teal-900 placeholder:text-teal-300 transition-all focus:border-teal-500 focus:outline-none focus:ring-4 focus:ring-teal-500/12"
                       autoFocus
                       aria-label="Rejection reason"
                     />
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex flex-col gap-3 sm:flex-row">
                     <button
                       onClick={() => { setShowRejectInput(false); setRejectComment(""); }}
-                      className="flex-1 py-2 text-sm font-medium text-teal-700 border border-beige-200 hover:bg-beige-100 rounded-lg transition-colors"
+                      className="flex-1 rounded-2xl border border-beige-200 px-4 py-3 text-sm font-medium text-teal-700 transition-colors hover:bg-beige-100"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleReject}
                       disabled={!rejectComment.trim() || actionLoading}
-                      className="flex-1 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 disabled:bg-red-300 rounded-lg transition-all"
+                      className="flex-1 rounded-2xl bg-red-500 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-red-600 disabled:bg-red-300"
                     >
                       {actionLoading ? "Rejecting..." : "Confirm Rejection"}
                     </button>
@@ -247,26 +252,24 @@ export const ExpenseDetail = () => {
           )}
         </div>
 
-        {/* Approval Timeline */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-xl border border-beige-200 p-6 animate-slide-up" style={{ animationDelay: "150ms" }}>
-            <h2 className="text-lg font-bold text-teal-900 mb-4">Approval Timeline</h2>
+        <div className="page-section p-5 sm:p-7 animate-fade-in-up" style={{ animationDelay: "100ms" }}>
+          <h2 className="text-teal-950">Approval timeline</h2>
+          <div className="mt-5">
             <ApprovalTimeline approvalLogs={expense.approval_logs || expense.approvalLogs || []} />
           </div>
         </div>
       </div>
 
-      {/* Lightbox */}
       {lightboxOpen && receiptUrl && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
           onClick={() => setLightboxOpen(false)}
         >
-          <div className="max-w-4xl max-h-[90vh] animate-scale-in" onClick={(e) => e.stopPropagation()}>
+          <div className="max-h-[90vh] max-w-4xl animate-scale-in" onClick={(e) => e.stopPropagation()}>
             <img
               src={receiptUrl}
               alt="Receipt Full View"
-              className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+              className="max-h-[90vh] max-w-full rounded-2xl object-contain shadow-2xl"
             />
           </div>
         </div>

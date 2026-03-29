@@ -159,9 +159,12 @@ const Router = createBrowserRouter([
       {
         path: "settings",
         element: (
-          <div className="animate-fade-in">
-            <h1 className="text-2xl font-bold text-teal-900 mb-2">Settings</h1>
-            <p className="text-sm text-teal-500">Settings page coming soon.</p>
+          <div className="page-section p-8">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-teal-700">Settings</p>
+            <h1 className="mt-3 text-5xl font-extrabold tracking-tight text-slate-950">Workspace settings</h1>
+            <p className="mt-3 max-w-2xl text-lg text-slate-600">
+              Settings are not wired up yet, but this space is now ready for profile, policy, notification, and reimbursement preference controls.
+            </p>
           </div>
         ),
       },

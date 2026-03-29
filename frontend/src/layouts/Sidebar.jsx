@@ -9,8 +9,6 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  ChevronLeft,
-  ChevronRight,
   Menu,
   X,
 } from "lucide-react";
@@ -25,14 +23,13 @@ const navItems = [
 ];
 
 export const Sidebar = () => {
-  const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout, isAdmin, isManager } = useAuth();
 
   const userRole = user?.role || "employee";
-
   const filteredItems = navItems.filter((item) => item.roles.includes(userRole));
 
   const handleNav = (path) => {
@@ -40,135 +37,105 @@ export const Sidebar = () => {
     setMobileOpen(false);
   };
 
-  const isActive = (path) => {
-    if (path === "/dashboard") return location.pathname === "/dashboard";
-    return location.pathname.startsWith(path);
-  };
+  const isActive = (path) =>
+    path === "/dashboard"
+      ? location.pathname === "/dashboard"
+      : location.pathname.startsWith(path);
 
   const roleLabel = isAdmin ? "Admin" : isManager ? "Manager" : "Employee";
-  const roleBadgeColor = isAdmin
-    ? "bg-peach-400 text-teal-900"
-    : isManager
-      ? "bg-teal-300 text-teal-900"
-      : "bg-teal-100 text-teal-700";
+  const initial = user?.fullName?.charAt(0)?.toUpperCase() || "U";
 
   return (
     <>
-      {/* Mobile toggle button */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="fixed top-4 left-4 z-50 lg:hidden p-2 rounded-lg bg-teal-900 text-white shadow-lg hover:bg-teal-800 transition-colors"
+        className="fixed left-4 top-4 z-50 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-900 text-white shadow-lg lg:hidden"
         aria-label="Open sidebar"
       >
-        <Menu className="w-5 h-5" />
+        <Menu className="h-5 w-5" />
       </button>
 
-      {/* Mobile overlay */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-slate-950/28 backdrop-blur-[2px] lg:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={`
-          fixed top-0 left-0 z-50 h-screen flex flex-col
-          bg-teal-900 text-white
-          transition-all duration-300 ease-in-out
-          ${collapsed ? "w-20" : "w-64"}
+          fixed left-0 top-0 z-50 flex h-screen w-[272px] flex-col border-r border-slate-200 bg-[#0f5c57] text-white
+          transition-transform duration-300 ease-out
           ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
-          lg:translate-x-0 lg:static lg:z-auto
+          lg:static lg:translate-x-0
         `}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 h-16 border-b border-teal-800 shrink-0">
-          {!collapsed && (
-            <h1 className="text-lg font-bold tracking-tight animate-fade-in">
-              <span className="text-peach-400">Expense</span>Flow
-            </h1>
-          )}
-          {collapsed && (
-            <span className="text-peach-400 font-bold text-xl mx-auto">E</span>
-          )}
+        <div className="flex h-20 items-center justify-between border-b border-white/10 px-6">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-teal-100/70">
+              Workspace
+            </p>
+            <p className="mt-1 text-2xl font-extrabold tracking-tight text-white">
+              ExpenseFlow
+            </p>
+          </div>
 
-          {/* Close on mobile */}
           <button
             onClick={() => setMobileOpen(false)}
-            className="lg:hidden p-1 rounded hover:bg-teal-800 transition-colors"
+            className="rounded-xl p-2 text-teal-100/80 hover:bg-white/10 lg:hidden"
             aria-label="Close sidebar"
           >
-            <X className="w-5 h-5" />
-          </button>
-
-          {/* Collapse toggle on desktop */}
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="hidden lg:flex p-1 rounded hover:bg-teal-800 transition-colors"
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+            <X className="h-4 w-4" />
           </button>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
+        <nav className="flex-1 space-y-1 px-4 py-6">
           {filteredItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
+
             return (
               <button
                 key={item.path}
                 onClick={() => handleNav(item.path)}
                 className={`
-                  w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
-                  text-sm font-medium transition-all duration-200
+                  flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-base font-semibold transition-all duration-200
                   ${active
-                    ? "bg-teal-500 text-white shadow-md"
-                    : "text-teal-100 hover:bg-teal-800 hover:text-white"
+                    ? "bg-white text-teal-900 shadow-[0_14px_30px_rgba(8,38,37,0.18)]"
+                    : "text-teal-50/92 hover:bg-white/10"
                   }
-                  ${collapsed ? "justify-center" : ""}
                 `}
-                title={collapsed ? item.label : undefined}
-                aria-label={item.label}
-                aria-current={active ? "page" : undefined}
               >
-                <Icon className={`w-5 h-5 shrink-0 ${active ? "text-white" : "text-teal-300"}`} />
-                {!collapsed && <span>{item.label}</span>}
+                <Icon className={`h-5 w-5 flex-shrink-0 ${active ? "text-teal-700" : "text-teal-100"}`} />
+                <span>{item.label}</span>
               </button>
             );
           })}
         </nav>
 
-        {/* User Section */}
-        <div className="border-t border-teal-800 p-3 shrink-0">
-          <div className={`flex items-center ${collapsed ? "justify-center" : "gap-3"}`}>
-            <div className="w-9 h-9 rounded-full bg-teal-500 flex items-center justify-center text-sm font-bold shrink-0">
-              {user?.fullName?.charAt(0)?.toUpperCase() || "U"}
-            </div>
-            {!collapsed && (
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{user?.fullName || "User"}</p>
-                <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full ${roleBadgeColor}`}>
-                  {roleLabel}
-                </span>
+        <div className="border-t border-white/10 p-4">
+          <div className="mb-3 rounded-2xl bg-white/10 p-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/20 text-sm font-bold text-white">
+                {initial}
               </div>
-            )}
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-white">
+                  {user?.fullName || "User"}
+                </p>
+                <p className="mt-0.5 text-xs text-teal-100/80">
+                  {roleLabel}
+                </p>
+              </div>
+            </div>
           </div>
 
           <button
             onClick={logout}
-            className={`
-              mt-3 w-full flex items-center gap-2 px-3 py-2 rounded-lg
-              text-sm text-teal-200 hover:bg-red-500/20 hover:text-red-300
-              transition-colors
-              ${collapsed ? "justify-center" : ""}
-            `}
-            aria-label="Logout"
+            className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-teal-50/92 transition-all hover:bg-white/10"
           >
-            <LogOut className="w-4 h-4" />
-            {!collapsed && <span>Logout</span>}
+            <LogOut className="h-4 w-4" />
+            Logout
           </button>
         </div>
       </aside>

@@ -11,32 +11,30 @@ export const DataTable = ({
 }) => {
   if (loading) {
     return (
-      <div className="bg-white rounded-xl border border-beige-200 overflow-hidden">
-        <div className="p-8">
-          <LoadingSpinner size="md" />
-        </div>
+      <div className="page-section p-12">
+        <LoadingSpinner size="md" />
       </div>
     );
   }
 
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-beige-200 p-8">
+      <div className="page-section p-10">
         <EmptyState message={emptyMessage} action={emptyAction} />
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-xl border border-beige-200 overflow-hidden">
+    <div className="page-section overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-beige-200 bg-beige-50/50">
+        <table className="w-full min-w-[720px]">
+          <thead className="bg-slate-50">
+            <tr>
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className="px-4 py-3 text-left text-xs font-semibold text-teal-600 uppercase tracking-wider"
+                  className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-500"
                   style={{ width: col.width }}
                 >
                   {col.label}
@@ -44,18 +42,12 @@ export const DataTable = ({
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-beige-100">
+          <tbody>
             {data.map((row, idx) => (
               <tr
                 key={row._id || row.id || idx}
                 onClick={() => onRowClick?.(row)}
-                className={`
-                  transition-all duration-200
-                  hover:bg-teal-50/50 hover:shadow-sm
-                  ${onRowClick ? "cursor-pointer" : ""}
-                  animate-fade-in
-                `}
-                style={{ animationDelay: `${idx * 30}ms` }}
+                className={`border-t border-slate-100 ${onRowClick ? "cursor-pointer hover:bg-slate-50" : ""}`}
                 tabIndex={onRowClick ? 0 : undefined}
                 role={onRowClick ? "button" : undefined}
                 onKeyDown={(e) => {
@@ -63,7 +55,10 @@ export const DataTable = ({
                 }}
               >
                 {columns.map((col) => (
-                  <td key={col.key} className="px-4 py-3.5 text-sm text-teal-800">
+                  <td
+                    key={col.key}
+                    className="px-6 py-5 align-top text-sm text-slate-700"
+                  >
                     {col.render ? col.render(row[col.key], row) : row[col.key]}
                   </td>
                 ))}

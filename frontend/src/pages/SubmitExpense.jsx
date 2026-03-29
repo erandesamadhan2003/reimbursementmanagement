@@ -3,15 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useExpenses } from "@/hooks/useExpenses";
 import { OCRUpload } from "@/components/OCRUpload";
 import { toast } from "@/components/ui/Toast";
-import {
-  ArrowLeft,
-  FileText,
-  Tag,
-  DollarSign,
-  Calendar,
-  AlignLeft,
-  Send,
-} from "lucide-react";
+import { ArrowLeft, Send } from "lucide-react";
 
 const categories = [
   "Travel",
@@ -38,7 +30,6 @@ export const SubmitExpense = () => {
   });
   const [errors, setErrors] = useState({});
 
-  // Auto-fill from OCR
   useEffect(() => {
     if (ocrData) {
       setFormData((prev) => ({
@@ -86,158 +77,161 @@ export const SubmitExpense = () => {
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: null }));
   };
 
+  const inputClass = (hasError) =>
+    `w-full rounded-2xl border ${hasError ? "border-red-300" : "border-slate-200"} bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-4 focus:ring-teal-500/10`;
+
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-3">
+    <div className="space-y-6">
+      <div className="flex items-start gap-3">
         <button
           onClick={() => navigate("/dashboard")}
-          className="p-2 rounded-lg hover:bg-beige-100 transition-colors"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 transition-all hover:bg-slate-50"
           aria-label="Go back"
         >
-          <ArrowLeft className="w-5 h-5 text-teal-700" />
+          <ArrowLeft className="h-5 w-5" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-teal-900">Submit Expense</h1>
-          <p className="text-sm text-teal-500">Fill in the details or scan a receipt</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-teal-700">Submit expense</p>
+          <h1 className="mt-2 text-[clamp(2.2rem,4vw,4.2rem)] font-extrabold leading-[0.95] text-slate-950">
+            Create a new reimbursement request.
+          </h1>
+          <p className="mt-3 max-w-3xl text-lg text-slate-600">
+            Fill in the expense details on the left and optionally scan a receipt on the right to auto-fill fields.
+          </p>
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-5 gap-6">
-        {/* Form */}
-        <div className="lg:col-span-3">
-          <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-beige-200 p-6 space-y-5 animate-slide-up">
-            {/* Title */}
-            <div>
-              <label htmlFor="expense-title" className="block text-sm font-medium text-teal-800 mb-1.5">
-                Title *
-              </label>
-              <div className="relative">
-                <FileText className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-teal-400" />
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.6fr)_420px]">
+        <div className="page-section p-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid gap-5 md:grid-cols-2">
+              <div className="md:col-span-2">
+                <label htmlFor="expense-title" className="mb-2 block text-sm font-semibold text-slate-700">
+                  Title *
+                </label>
                 <input
                   id="expense-title"
                   type="text"
-                  placeholder="e.g., Client dinner, Flight ticket"
+                  placeholder="Client dinner, flight ticket, hotel stay"
                   value={formData.title}
                   onChange={(e) => updateField("title", e.target.value)}
-                  className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${errors.title ? "border-red-300" : "border-beige-200"} bg-beige-50/50 text-sm text-teal-900 placeholder:text-teal-300 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all`}
+                  className={inputClass(errors.title)}
                 />
+                {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title}</p>}
               </div>
-              {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
-            </div>
 
-            {/* Category */}
-            <div>
-              <label htmlFor="expense-category" className="block text-sm font-medium text-teal-800 mb-1.5">
-                Category *
-              </label>
-              <div className="relative">
-                <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-teal-400" />
+              <div>
+                <label htmlFor="expense-category" className="mb-2 block text-sm font-semibold text-slate-700">
+                  Category *
+                </label>
                 <select
                   id="expense-category"
                   value={formData.category}
                   onChange={(e) => updateField("category", e.target.value)}
-                  className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${errors.category ? "border-red-300" : "border-beige-200"} bg-beige-50/50 text-sm text-teal-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all appearance-none cursor-pointer`}
+                  className={`${inputClass(errors.category)} cursor-pointer`}
                 >
                   <option value="">Select a category</option>
                   {categories.map((cat) => (
                     <option key={cat} value={cat}>{cat}</option>
                   ))}
                 </select>
+                {errors.category && <p className="mt-1 text-xs text-red-500">{errors.category}</p>}
               </div>
-              {errors.category && <p className="text-xs text-red-500 mt-1">{errors.category}</p>}
-            </div>
 
-            {/* Amount & Date row */}
-            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="expense-amount" className="block text-sm font-medium text-teal-800 mb-1.5">
+                <label htmlFor="expense-amount" className="mb-2 block text-sm font-semibold text-slate-700">
                   Amount *
                 </label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-teal-400" />
-                  <input
-                    id="expense-amount"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="0.00"
-                    value={formData.amount}
-                    onChange={(e) => updateField("amount", e.target.value)}
-                    className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${errors.amount ? "border-red-300" : "border-beige-200"} bg-beige-50/50 text-sm text-teal-900 placeholder:text-teal-300 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all`}
-                  />
-                </div>
-                {errors.amount && <p className="text-xs text-red-500 mt-1">{errors.amount}</p>}
+                <input
+                  id="expense-amount"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="0.00"
+                  value={formData.amount}
+                  onChange={(e) => updateField("amount", e.target.value)}
+                  className={inputClass(errors.amount)}
+                />
+                {errors.amount && <p className="mt-1 text-xs text-red-500">{errors.amount}</p>}
               </div>
 
               <div>
-                <label htmlFor="expense-date" className="block text-sm font-medium text-teal-800 mb-1.5">
+                <label htmlFor="expense-date" className="mb-2 block text-sm font-semibold text-slate-700">
                   Date *
                 </label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-teal-400" />
-                  <input
-                    id="expense-date"
-                    type="date"
-                    value={formData.date}
-                    onChange={(e) => updateField("date", e.target.value)}
-                    className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${errors.date ? "border-red-300" : "border-beige-200"} bg-beige-50/50 text-sm text-teal-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all`}
-                  />
-                </div>
-                {errors.date && <p className="text-xs text-red-500 mt-1">{errors.date}</p>}
+                <input
+                  id="expense-date"
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => updateField("date", e.target.value)}
+                  className={inputClass(errors.date)}
+                />
+                {errors.date && <p className="mt-1 text-xs text-red-500">{errors.date}</p>}
               </div>
-            </div>
 
-            {/* Description */}
-            <div>
-              <label htmlFor="expense-description" className="block text-sm font-medium text-teal-800 mb-1.5">
-                Description
-              </label>
-              <div className="relative">
-                <AlignLeft className="absolute left-3 top-3 w-4 h-4 text-teal-400" />
+              <div className="md:col-span-2">
+                <label htmlFor="expense-description" className="mb-2 block text-sm font-semibold text-slate-700">
+                  Description
+                </label>
                 <textarea
                   id="expense-description"
-                  placeholder="Additional details about this expense..."
+                  placeholder="Add supporting detail, attendee names, project codes, or business purpose"
                   value={formData.description}
                   onChange={(e) => updateField("description", e.target.value)}
-                  rows={3}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-beige-200 bg-beige-50/50 text-sm text-teal-900 placeholder:text-teal-300 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all resize-none"
+                  rows={6}
+                  className={`${inputClass(false)} resize-y`}
                 />
               </div>
             </div>
 
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-2.5 text-sm font-semibold text-white bg-teal-500 hover:bg-teal-600 disabled:bg-teal-300 rounded-lg transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Submitting...
-                </>
-              ) : (
-                <>
-                  <Send className="w-4 h-4" />
-                  Submit Expense
-                </>
-              )}
-            </button>
+            <div className="flex flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-slate-500">
+                Make sure the title, amount, and date match the receipt before submitting.
+              </p>
+              <button
+                type="submit"
+                disabled={loading}
+                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-teal-700 px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-teal-800 disabled:bg-teal-300"
+              >
+                {loading ? (
+                  <>
+                    <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-4 w-4" />
+                    Submit Expense
+                  </>
+                )}
+              </button>
+            </div>
           </form>
         </div>
 
-        {/* OCR Upload */}
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-xl border border-beige-200 p-6 animate-slide-up" style={{ animationDelay: "100ms" }}>
-            <h3 className="text-sm font-bold text-teal-900 mb-3">Scan Receipt</h3>
-            <p className="text-xs text-teal-500 mb-4">Upload a receipt image to auto-fill fields</p>
-            <OCRUpload
-              onScan={scanOcr}
-              ocrLoading={ocrLoading}
-              ocrData={ocrData}
-              onClear={clearOcr}
-            />
+        <div className="space-y-6">
+          <div className="page-section p-6">
+            <h2 className="text-2xl font-bold text-slate-950">Receipt scan</h2>
+            <p className="mt-2 text-base text-slate-500">
+              Upload a receipt image to auto-fill the form details.
+            </p>
+            <div className="mt-5">
+              <OCRUpload
+                onScan={scanOcr}
+                ocrLoading={ocrLoading}
+                ocrData={ocrData}
+                onClear={clearOcr}
+              />
+            </div>
+          </div>
+
+          <div className="page-section p-6">
+            <h3 className="text-lg font-bold text-slate-950">Tips</h3>
+            <ul className="mt-3 space-y-2 text-sm text-slate-600">
+              <li>Use a short, clear title.</li>
+              <li>Upload a flat, readable receipt image.</li>
+              <li>Add context if the expense might need explanation.</li>
+            </ul>
           </div>
         </div>
       </div>

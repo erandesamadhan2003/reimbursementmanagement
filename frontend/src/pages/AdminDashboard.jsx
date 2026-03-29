@@ -2,7 +2,7 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 import { useExpenses } from "@/hooks/useExpenses";
 import { StatCard } from "@/components/ui/StatCard";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
-import { BarChart3, TrendingUp, Clock, DollarSign, PieChart } from "lucide-react";
+import { BarChart3, TrendingUp, Clock, DollarSign, PieChart, Activity } from "lucide-react";
 
 export const AdminDashboard = () => {
   const { summary, byCategory, loading: analyticsLoading } = useAnalytics();
@@ -25,41 +25,43 @@ export const AdminDashboard = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-teal-900">Analytics</h1>
-        <p className="text-sm text-teal-500 mt-1">Company-wide expense insights</p>
+      <section className="grid gap-5 lg:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.95fr)]">
+        <div className="page-section p-6 sm:p-8 animate-fade-in-up">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/75 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-teal-500">
+            <Activity className="h-3.5 w-3.5" />
+            Analytics
+          </div>
+          <h1 className="mt-4 text-teal-950">See company reimbursement health at a glance.</h1>
+          <p className="mt-3 max-w-2xl text-sm sm:text-base">
+            The analytics view is now lighter, faster to scan, and responsive enough to keep charts and summaries readable on smaller screens.
+          </p>
+        </div>
+
+        <div className="page-section p-5 animate-fade-in-up" style={{ animationDelay: "90ms" }}>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-400">
+            Pending liability
+          </p>
+          <p className="mt-3 text-3xl font-bold text-teal-950">
+            ${parseFloat(totalPending).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+          </p>
+          <p className="mt-2 text-sm text-teal-500">
+            Current reimbursement amount waiting to be resolved
+          </p>
+        </div>
+      </section>
+
+      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+        <StatCard icon={BarChart3} label="Total Expenses" value={totalExpenses} index={0} />
+        <StatCard icon={TrendingUp} label="Approval Rate" value={`${approvalRate}%`} accent="green" index={1} />
+        <StatCard icon={Clock} label="Avg. Resolution" value={`${avgResolution}`} accent="amber" index={2} />
+        <StatCard icon={DollarSign} label="Pending Amount" value={`$${parseFloat(totalPending).toFixed(0)}`} accent="red" index={3} />
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          icon={BarChart3}
-          label="Total Expenses"
-          value={totalExpenses}
-        />
-        <StatCard
-          icon={TrendingUp}
-          label="Approval Rate"
-          value={`${approvalRate}`}
-        />
-        <StatCard
-          icon={Clock}
-          label="Avg. Resolution"
-          value={`${avgResolution}`}
-        />
-        <StatCard
-          icon={DollarSign}
-          label="Pending Amount"
-          value={`$${parseFloat(totalPending).toFixed(0)}`}
-        />
-      </div>
-
-      {/* Category Breakdown */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl border border-beige-200 p-6">
-          <div className="flex items-center gap-2 mb-6">
-            <PieChart className="w-5 h-5 text-teal-500" />
-            <h2 className="text-lg font-bold text-teal-900">By Category</h2>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="page-section p-6 sm:p-8">
+          <div className="mb-6 flex items-center gap-2">
+            <PieChart className="h-5 w-5 text-teal-500" />
+            <h2 className="text-teal-950">By Category</h2>
           </div>
 
           {byCategory && byCategory.length > 0 ? (
@@ -75,17 +77,18 @@ export const AdminDashboard = () => {
                   "bg-teal-700",
                   "bg-teal-200",
                 ];
+
                 return (
-                  <div key={idx} className="animate-fade-in" style={{ animationDelay: `${idx * 80}ms` }}>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-sm font-medium text-teal-800 capitalize">
+                  <div key={idx} className="animate-fade-in-up" style={{ animationDelay: `${idx * 70}ms` }}>
+                    <div className="mb-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                      <span className="text-sm font-medium capitalize text-teal-800">
                         {cat.category || "Other"}
                       </span>
                       <span className="text-sm font-semibold text-teal-900">
                         ${parseFloat(amount).toLocaleString()} ({cat.count || 0})
                       </span>
                     </div>
-                    <div className="h-2 bg-beige-100 rounded-full overflow-hidden">
+                    <div className="h-2.5 overflow-hidden rounded-full bg-beige-100">
                       <div
                         className={`h-full rounded-full transition-all duration-700 ease-out ${colors[idx % colors.length]}`}
                         style={{ width: `${percentage}%` }}
@@ -96,13 +99,12 @@ export const AdminDashboard = () => {
               })}
             </div>
           ) : (
-            <p className="text-sm text-teal-400 text-center py-8">No category data available</p>
+            <p className="py-8 text-center text-sm text-teal-400">No category data available</p>
           )}
         </div>
 
-        {/* Summary Cards */}
-        <div className="bg-white rounded-xl border border-beige-200 p-6">
-          <h2 className="text-lg font-bold text-teal-900 mb-6">Status Overview</h2>
+        <div className="page-section p-6 sm:p-8">
+          <h2 className="mb-6 text-teal-950">Status Overview</h2>
           <div className="space-y-4">
             {[
               { label: "Pending", count: summary?.count_pending || 0, color: "bg-status-pending", lightBg: "bg-status-pending-bg" },
@@ -111,11 +113,11 @@ export const AdminDashboard = () => {
             ].map((item, idx) => (
               <div
                 key={idx}
-                className={`flex items-center justify-between p-4 rounded-lg ${item.lightBg} animate-slide-up`}
+                className={`flex items-center justify-between rounded-2xl p-4 ${item.lightBg} animate-slide-up`}
                 style={{ animationDelay: `${idx * 100}ms` }}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-3 h-3 rounded-full ${item.color}`} />
+                  <div className={`h-3 w-3 rounded-full ${item.color}`} />
                   <span className="text-sm font-medium text-teal-900">{item.label}</span>
                 </div>
                 <span className="text-xl font-bold text-teal-900">{item.count}</span>

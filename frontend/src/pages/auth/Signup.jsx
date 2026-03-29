@@ -1,243 +1,314 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock, User, Building, Globe } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, Building, Globe, ArrowRight, CheckCircle } from "lucide-react";
+
+const GoogleIcon = () => (
+  <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
+    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
+    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+  </svg>
+);
+
+const featureList = [
+  "Smart OCR receipt scanning",
+  "Multi-level approval workflows",
+  "Real-time analytics & reporting",
+  "Role-based access control",
+];
+
+/* ── Reusable labelled field ──────────────────────────────────── */
+const Field = ({ label, htmlFor, children }) => (
+  <div className="w-full">
+    <label htmlFor={htmlFor} className="block text-[11px] font-bold uppercase tracking-[0.06em] text-teal-700 dark:text-teal-300 mb-2.5">
+      {label}
+    </label>
+    {children}
+  </div>
+);
+
+/* ── Input with leading icon ──────────────────────────────────── */
+const IconInput = ({ icon: Icon, type = "text", ...props }) => (
+  <div className="relative flex items-center w-full">
+    <Icon className="absolute left-4 w-5 h-5 text-teal-500/60 dark:text-teal-400/60 pointer-events-none" />
+    <input
+      type={type}
+      {...props}
+      style={{ paddingLeft: "3rem" }}
+      className="
+        w-full h-12 pr-4 rounded-xl
+        border border-beige-300 dark:border-white/10 
+        bg-white/80 dark:bg-[#161b22]/80 backdrop-blur-md
+        text-base font-medium text-teal-950 dark:text-white placeholder:text-teal-400 dark:placeholder:text-teal-600
+        focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500
+        transition-all duration-200 shadow-sm
+      "
+    />
+  </div>
+);
 
 export const Signup = () => {
   const { register, googleLoginHandler, loading, error, clearAuthError } = useAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    password: "",
-    companyName: "",
-    country: "",
+    fullName: "", email: "", password: "", companyName: "", country: "",
   });
   const [showPassword, setShowPassword] = useState(false);
 
-  useEffect(() => {
-    clearAuthError();
-  }, []);
+  useEffect(() => { clearAuthError(); }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await register(formData);
-    } catch (err) {
-      console.error("Registration failed:", err);
-    }
+    try { await register(formData); } catch { /* handled by hook */ }
   };
 
+  const update = (field) => (e) =>
+    setFormData((prev) => ({ ...prev, [field]: e.target.value }));
+
   return (
-    <div className="min-h-screen flex bg-beige-50">
-      {/* Left — Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-teal-900 relative overflow-hidden items-center justify-center p-12">
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-teal-800/40" />
-        <div className="absolute bottom-[-15%] right-[-10%] w-[400px] h-[400px] rounded-full bg-teal-700/30" />
-        <div className="absolute top-1/3 right-1/4 w-[200px] h-[200px] rounded-full bg-peach-400/10" />
+    <div className="min-h-screen flex bg-beige-50 dark:bg-[#0d1117]">
 
-        <div className="relative z-10 max-w-md text-center animate-fade-in">
-          <h1 className="text-4xl font-bold text-white mb-4">
-            <span className="text-peach-400">Expense</span>Flow
-          </h1>
-          <p className="text-teal-200 text-lg mb-8">
-            Join thousands of companies managing their expenses efficiently. Set up in minutes.
-          </p>
+      {/* ── Left panel ─────────────────────────────────────────── */}
+      <div className="hidden lg:flex lg:w-1/2 bg-[#0f4f4a] relative overflow-hidden items-center justify-center p-14 flex-col">
+        {/* Decorative blobs */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -top-32 -left-32 w-[600px] h-[600px] rounded-full bg-teal-800/60 blur-[120px]" />
+          <div className="absolute -bottom-28 -right-20 w-[500px] h-[500px] rounded-full bg-teal-700/50 blur-[100px]" />
+          <div className="absolute top-1/3 right-1/4 w-[250px] h-[250px] rounded-full bg-peach-400/10 blur-[80px]" />
+        </div>
 
-          <div className="space-y-3 text-left">
-            {[
-              "Smart OCR receipt scanning",
-              "Multi-level approval workflows",
-              "Real-time analytics & reporting",
-              "Role-based access control",
-            ].map((feature, idx) => (
+        <div className="relative z-10 max-w-lg w-full">
+          {/* Logo */}
+          <div className="mb-12">
+            <h1 className="text-5xl font-extrabold text-white tracking-tight drop-shadow-md">
+              <span className="text-peach-400">Expense</span>Flow
+            </h1>
+            <p className="text-teal-200 text-lg mt-4 leading-relaxed font-medium">
+              Join thousands of companies managing their expenses efficiently. Set up in minutes.
+            </p>
+          </div>
+
+          {/* Feature checklist */}
+          <div className="space-y-4">
+            {featureList.map((feature, i) => (
               <div
-                key={idx}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10"
+                key={i}
+                className="flex items-center gap-4 px-5 py-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md shadow-lg"
               >
-                <div className="w-6 h-6 rounded-full bg-peach-400/20 flex items-center justify-center shrink-0">
-                  <span className="text-peach-400 text-xs">✓</span>
+                <div className="w-8 h-8 rounded-full bg-peach-400/20 flex items-center justify-center flex-shrink-0">
+                  <CheckCircle className="w-5 h-5 text-peach-300" />
                 </div>
-                <p className="text-sm text-teal-100">{feature}</p>
+                <p className="text-base font-bold text-white">{feature}</p>
               </div>
             ))}
+          </div>
+
+          {/* Social proof */}
+          <div className="mt-10 flex items-center gap-4 px-6 py-4 rounded-2xl bg-gradient-to-br from-white/10 to-transparent border border-white/10 backdrop-blur-xl">
+            <div className="flex -space-x-3">
+              {["A", "B", "C", "D"].map((l, index) => (
+                <div key={l} className="w-9 h-9 rounded-full bg-teal-600 border-2 border-teal-900 flex items-center justify-center text-xs font-bold text-white shadow-md relative z-[${10-index}]">
+                  {l}
+                </div>
+              ))}
+            </div>
+            <p className="text-sm text-teal-200 font-medium">
+              <span className="text-white font-extrabold text-base">2,400+</span> teams trust us
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Right — Form */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-8">
-        <div className="w-full max-w-md animate-slide-up">
-          {/* Mobile logo */}
-          <div className="lg:hidden mb-8 text-center">
-            <h1 className="text-2xl font-bold">
-              <span className="text-peach-400">Expense</span>
-              <span className="text-teal-900">Flow</span>
+      {/* ── Right panel ────────────────────────────────────────── */}
+      <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-10 lg:p-16 overflow-y-auto relative z-10">
+        <div className="w-full max-w-md absolute top-8 text-center lg:hidden">
+            <h1 className="text-3xl font-extrabold tracking-tight dark:text-white">
+              <span className="text-peach-500">Expense</span>Flow
             </h1>
-          </div>
+        </div>
 
-          <div className="bg-white rounded-2xl shadow-xl shadow-teal-900/5 border border-beige-200 p-8">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-teal-900">Create an account</h2>
-              <p className="text-sm text-teal-500 mt-1">Start managing expenses in minutes</p>
-            </div>
-
-            {error && (
-              <div className="mb-4 p-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg text-center animate-scale-in" role="alert">
-                {error}
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label htmlFor="signup-name" className="block text-sm font-medium text-teal-800 mb-1.5">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-teal-400" />
-                  <input
-                    id="signup-name"
-                    type="text"
-                    placeholder="John Doe"
-                    value={formData.fullName}
-                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    required
-                    className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-beige-200 bg-beige-50/50 text-sm text-teal-900 placeholder:text-teal-300 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="signup-email" className="block text-sm font-medium text-teal-800 mb-1.5">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-teal-400" />
-                  <input
-                    id="signup-email"
-                    type="email"
-                    placeholder="you@company.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    required
-                    className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-beige-200 bg-beige-50/50 text-sm text-teal-900 placeholder:text-teal-300 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label htmlFor="signup-company" className="block text-sm font-medium text-teal-800 mb-1.5">
-                    Company
-                  </label>
-                  <div className="relative">
-                    <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-teal-400" />
-                    <input
-                      id="signup-company"
-                      type="text"
-                      placeholder="Acme Inc."
-                      value={formData.companyName}
-                      onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                      className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-beige-200 bg-beige-50/50 text-sm text-teal-900 placeholder:text-teal-300 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label htmlFor="signup-country" className="block text-sm font-medium text-teal-800 mb-1.5">
-                    Country
-                  </label>
-                  <div className="relative">
-                    <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-teal-400" />
-                    <input
-                      id="signup-country"
-                      type="text"
-                      placeholder="India"
-                      value={formData.country}
-                      onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                      className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-beige-200 bg-beige-50/50 text-sm text-teal-900 placeholder:text-teal-300 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="signup-password" className="block text-sm font-medium text-teal-800 mb-1.5">
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-teal-400" />
-                  <input
-                    id="signup-password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Min. 8 characters"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    required
-                    minLength={8}
-                    className="w-full pl-10 pr-10 py-2.5 rounded-lg border border-beige-200 bg-beige-50/50 text-sm text-teal-900 placeholder:text-teal-300 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-teal-400 hover:text-teal-600 transition-colors"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-2.5 text-sm font-semibold text-white bg-teal-500 hover:bg-teal-600 disabled:bg-teal-300 rounded-lg transition-all shadow-sm hover:shadow-md disabled:cursor-not-allowed"
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Creating account...
-                  </span>
-                ) : (
-                  "Create Account"
-                )}
-              </button>
-
-              <div className="relative my-4">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-beige-200" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-3 text-teal-400 font-medium">Or continue with</span>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={googleLoginHandler}
-                disabled={loading}
-                className="w-full py-2.5 text-sm font-medium text-teal-800 bg-white border border-beige-200 hover:bg-beige-50 rounded-lg transition-all shadow-sm flex items-center justify-center gap-2"
-              >
-                <svg className="w-4 h-4" viewBox="0 0 24 24">
-                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
-                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                </svg>
-                {loading ? "Processing..." : "Sign up with Google"}
-              </button>
-            </form>
-
-            <p className="text-center text-sm text-teal-500 mt-6">
-              Already have an account?{" "}
-              <button
-                onClick={() => navigate("/login")}
-                className="text-teal-600 font-semibold hover:text-teal-700 hover:underline transition-colors"
-              >
-                Sign in
-              </button>
+        <div className="w-full max-w-[420px] mt-12 lg:mt-0 pb-8">
+          <div className="mb-8 text-center lg:text-left">
+            <h2 className="text-3xl font-extrabold text-teal-950 dark:text-white tracking-tight">
+              Create an account
+            </h2>
+            <p className="text-base text-teal-600 dark:text-teal-400 font-medium mt-2">
+              Start managing expenses in minutes — no credit card needed
             </p>
           </div>
+
+          {/* Error alert */}
+          {error && (
+            <div role="alert" className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-sm font-semibold text-red-600 dark:text-red-400 animate-scale-in flex items-start gap-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0" />
+              {error}
+            </div>
+          )}
+
+          {/* Google */}
+          <button
+            type="button"
+            onClick={googleLoginHandler}
+            disabled={loading}
+            className="
+              w-full h-12 mb-6 rounded-xl
+              flex items-center justify-center gap-3
+              text-sm font-bold text-teal-900 dark:text-white
+              bg-white dark:bg-[#161b22] border border-beige-300 dark:border-white/10
+              hover:bg-beige-100 dark:hover:bg-[#212830]
+              shadow-[0_2px_8px_rgba(23,65,67,0.06)] dark:shadow-sm
+              disabled:opacity-50 active:scale-[0.98]
+              transition-all duration-200
+            "
+          >
+            <GoogleIcon />
+            {loading ? "Processing…" : "Continue with Google"}
+          </button>
+
+          {/* Divider */}
+          <div className="relative mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-beige-300 dark:border-white/10" />
+            </div>
+            <div className="relative flex justify-center">
+              <span className="bg-beige-50 dark:bg-[#0d1117] px-4 text-[10px] font-bold uppercase tracking-widest text-teal-500 dark:text-teal-400">
+                Or sign up with email
+              </span>
+            </div>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} noValidate className="space-y-5">
+
+            {/* Full name */}
+            <Field label="Full Name" htmlFor="signup-name">
+              <IconInput
+                id="signup-name"
+                icon={User}
+                type="text"
+                placeholder="John Doe"
+                value={formData.fullName}
+                onChange={update("fullName")}
+                required
+                autoComplete="name"
+              />
+            </Field>
+
+            {/* Email */}
+            <Field label="Email Address" htmlFor="signup-email">
+              <IconInput
+                id="signup-email"
+                icon={Mail}
+                type="email"
+                placeholder="you@company.com"
+                value={formData.email}
+                onChange={update("email")}
+                required
+                autoComplete="email"
+              />
+            </Field>
+
+            {/* Company + Country */}
+            <div className="grid grid-cols-2 gap-4">
+              <Field label="Company" htmlFor="signup-company">
+                <IconInput
+                  id="signup-company"
+                  icon={Building}
+                  type="text"
+                  placeholder="Acme Inc."
+                  value={formData.companyName}
+                  onChange={update("companyName")}
+                  autoComplete="organization"
+                />
+              </Field>
+              <Field label="Country" htmlFor="signup-country">
+                <IconInput
+                  id="signup-country"
+                  icon={Globe}
+                  type="text"
+                  placeholder="India"
+                  value={formData.country}
+                  onChange={update("country")}
+                  autoComplete="country-name"
+                />
+              </Field>
+            </div>
+
+            {/* Password */}
+            <Field label="Password" htmlFor="signup-password">
+              <div className="relative flex items-center w-full">
+                <Lock className="absolute left-4 w-5 h-5 text-teal-500/60 dark:text-teal-400/60 pointer-events-none" />
+                <input
+                  id="signup-password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Min. 8 characters"
+                  value={formData.password}
+                  onChange={update("password")}
+                  required
+                  minLength={8}
+                  autoComplete="new-password"
+                  style={{ paddingLeft: "3rem", paddingRight: "3rem" }}
+                  className="
+                    w-full h-12 rounded-xl
+                    border border-beige-300 dark:border-white/10 
+                    bg-white/80 dark:bg-[#161b22]/80 backdrop-blur-md
+                    text-base font-medium text-teal-950 dark:text-white placeholder:text-teal-400 dark:placeholder:text-teal-600
+                    focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500
+                    transition-all duration-200 shadow-sm
+                  "
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-4 text-teal-500 hover:text-teal-800 dark:text-teal-400 dark:hover:text-white transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </Field>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="
+                w-full mt-4 h-12 rounded-xl
+                flex items-center justify-center gap-2
+                text-base font-bold text-white
+                bg-gradient-to-r from-teal-700 to-teal-500 hover:from-teal-800 hover:to-teal-600
+                disabled:opacity-50 disabled:cursor-not-allowed
+                shadow-[0_4px_14px_rgba(42,82,80,0.4),inset_0_1px_0_rgba(255,255,255,0.2)]
+                hover:shadow-[0_6px_20px_rgba(42,82,80,0.5),inset_0_1px_0_rgba(255,255,255,0.2)]
+                active:scale-[0.98]
+                transition-all duration-200
+              "
+            >
+              {loading ? (
+                <>
+                  <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Creating account…
+                </>
+              ) : (
+                <>
+                  Create Account
+                  <ArrowRight className="w-5 h-5" />
+                </>
+              )}
+            </button>
+          </form>
+
+          <p className="text-center text-sm font-medium text-teal-600 dark:text-teal-400 mt-10">
+            Already have an account?{" "}
+            <button
+              onClick={() => navigate("/login")}
+              className="font-bold text-teal-800 dark:text-teal-200 hover:text-teal-950 dark:hover:text-white transition-colors underline underline-offset-4 decoration-2 decoration-teal-500/30"
+            >
+              Sign in
+            </button>
+          </p>
         </div>
       </div>
     </div>
