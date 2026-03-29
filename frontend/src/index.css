@@ -1,2 +1,139 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+@theme {
+  /* ── Color Palette ──────────────────────────────────────────── */
+  --color-beige-50: #FBF3F0;
+  --color-beige-100: #F5E5E1;
+  --color-beige-200: #F0DAD4;
+  --color-beige-300: #E8CBC3;
+
+  --color-peach-300: #FCC9A3;
+  --color-peach-400: #F9B487;
+  --color-peach-500: #F09A60;
+
+  --color-teal-50: #E8F4F3;
+  --color-teal-100: #D4E8E6;
+  --color-teal-200: #A8D1CE;
+  --color-teal-300: #6EADA8;
+  --color-teal-400: #518F8A;
+  --color-teal-500: #427A76;
+  --color-teal-600: #356662;
+  --color-teal-700: #2A5250;
+  --color-teal-800: #1E3C3B;
+  --color-teal-900: #174143;
+
+  /* ── Status Colors ──────────────────────────────────────────── */
+  --color-status-pending: #F59E0B;
+  --color-status-pending-bg: #FEF3C7;
+  --color-status-approved: #22C55E;
+  --color-status-approved-bg: #DCFCE7;
+  --color-status-rejected: #EF4444;
+  --color-status-rejected-bg: #FEE2E2;
+
+  /* ── Font ───────────────────────────────────────────────────── */
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+  /* ── Animations ─────────────────────────────────────────────── */
+  --animate-fade-in: fadeIn 0.5s ease-out both;
+  --animate-slide-up: slideUp 0.4s ease-out both;
+  --animate-scale-in: scaleIn 0.3s ease-out both;
+  --animate-slide-in-right: slideInRight 0.3s ease-out both;
+  --animate-fade-in-up: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-fade-in-up-stagger: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) var(--stagger-delay, 0s) both;
+}
+
+/* ── Keyframes ──────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* ── Base Styles ────────────────────────────────────────────── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  color: #174143;
+  background-color: #FBF3F0;
+  /* Add subtle background pattern */
+  background-image: radial-gradient(#F0DAD4 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ── Scrollbar Styling ──────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F5E5E1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #A8D1CE;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #427A76;
+}
+
+/* ── Focus Visible ──────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid #427A76;
+  outline-offset: 2px;
+}
+
+/* ── Selection ──────────────────────────────────────────────── */
+::selection {
+  background-color: #D4E8E6;
+  color: #174143;
+}
+
+/* ── Dark Mode ──────────────────────────────────────────────── */
+.dark {
+  color-scheme: dark;
+}
+
+.dark body {
+  background-color: #0F2526;
+  color: #E8F4F3;
+}

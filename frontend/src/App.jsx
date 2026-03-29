@@ -1,33 +1,35 @@
-import { createBrowserRouter, Navigate, RouterProvider } from "react-router";
-import "./App.css";
-import { Home } from "./pages/Home";
-import { Login } from "./pages/auth/Login";
-import { Signup } from "./pages/auth/Signup";
-import { Dashboard } from "./pages/Dashboard";
+import { lazy, Suspense } from "react";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { AuthCallBack } from "./pages/auth/AuthCallBack";
 import { useEffect, useState } from "react";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { ToastProvider } from "@/components/ui/Toast";
+import { DashboardLayout } from "@/layouts/DashboardLayout";
+import "./App.css";
 
+// Lazy loaded pages
+const Home = lazy(() => import("@/pages/Home").then((m) => ({ default: m.Home })));
+const Login = lazy(() => import("@/pages/auth/Login").then((m) => ({ default: m.Login })));
+const Signup = lazy(() => import("@/pages/auth/Signup").then((m) => ({ default: m.Signup })));
+const AuthCallBack = lazy(() => import("@/pages/auth/AuthCallBack").then((m) => ({ default: m.AuthCallBack })));
+const Dashboard = lazy(() => import("@/pages/Dashboard").then((m) => ({ default: m.Dashboard })));
+const SubmitExpense = lazy(() => import("@/pages/SubmitExpense").then((m) => ({ default: m.SubmitExpense })));
+const ExpenseDetail = lazy(() => import("@/pages/ExpenseDetail").then((m) => ({ default: m.ExpenseDetail })));
+const ManagerDashboard = lazy(() => import("@/pages/ManagerDashboard").then((m) => ({ default: m.ManagerDashboard })));
+const AdminDashboard = lazy(() => import("@/pages/AdminDashboard").then((m) => ({ default: m.AdminDashboard })));
+
+// Route guards
 const ProtectedRoute = ({ children }) => {
   const { token, isAuthenticated } = useSelector((state) => state.auth);
   const [shouldRender, setShouldRender] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShouldRender(true);
-    }, 0);
-
+    const timer = setTimeout(() => setShouldRender(true), 0);
     return () => clearTimeout(timer);
   }, []);
 
-  if (!shouldRender) {
-    return null;
-  }
-
-  if (!token || !isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
+  if (!shouldRender) return null;
+  if (!token || !isAuthenticated) return <Navigate to="/login" replace />;
   return children;
 };
 
@@ -36,33 +38,43 @@ const PublicRoute = ({ children }) => {
   const [shouldRender, setShouldRender] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShouldRender(true);
-    }, 0);
+    const timer = setTimeout(() => setShouldRender(true), 0);
     return () => clearTimeout(timer);
   }, []);
 
-  if (!shouldRender) {
-    return null; 
-  }
-
-  if (token && isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
+  if (!shouldRender) return null;
+  if (token && isAuthenticated) return <Navigate to="/dashboard" replace />;
   return children;
 };
+
+const RoleRoute = ({ children, roles }) => {
+  const { user } = useSelector((state) => state.auth);
+  if (!user || !roles.includes(user.role)) return <Navigate to="/dashboard" replace />;
+  return children;
+};
+
+const SuspenseWrapper = ({ children }) => (
+  <Suspense fallback={<LoadingSpinner fullPage message="Loading..." />}>
+    {children}
+  </Suspense>
+);
 
 const Router = createBrowserRouter([
   {
     path: "/",
-    element: <Home />,
+    element: (
+      <SuspenseWrapper>
+        <Home />
+      </SuspenseWrapper>
+    ),
   },
   {
     path: "/login",
     element: (
       <PublicRoute>
-        <Login />
+        <SuspenseWrapper>
+          <Login />
+        </SuspenseWrapper>
       </PublicRoute>
     ),
   },
@@ -70,29 +82,98 @@ const Router = createBrowserRouter([
     path: "/signup",
     element: (
       <PublicRoute>
-        <Signup />
+        <SuspenseWrapper>
+          <Signup />
+        </SuspenseWrapper>
       </PublicRoute>
     ),
   },
   {
     path: "/auth/callback",
-    element: <AuthCallBack />,
+    element: (
+      <SuspenseWrapper>
+        <AuthCallBack />
+      </SuspenseWrapper>
+    ),
   },
   {
     path: "/dashboard",
     element: (
       <ProtectedRoute>
-        <Dashboard />
+        <DashboardLayout />
       </ProtectedRoute>
     ),
+    children: [
+      {
+        index: true,
+        element: (
+          <SuspenseWrapper>
+            <Dashboard />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: "submit",
+        element: (
+          <SuspenseWrapper>
+            <SubmitExpense />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: "expenses",
+        element: (
+          <SuspenseWrapper>
+            <Dashboard />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: "expenses/:id",
+        element: (
+          <SuspenseWrapper>
+            <ExpenseDetail />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: "approvals",
+        element: (
+          <RoleRoute roles={["manager", "admin"]}>
+            <SuspenseWrapper>
+              <ManagerDashboard />
+            </SuspenseWrapper>
+          </RoleRoute>
+        ),
+      },
+      {
+        path: "admin",
+        element: (
+          <RoleRoute roles={["admin"]}>
+            <SuspenseWrapper>
+              <AdminDashboard />
+            </SuspenseWrapper>
+          </RoleRoute>
+        ),
+      },
+      {
+        path: "settings",
+        element: (
+          <div className="animate-fade-in">
+            <h1 className="text-2xl font-bold text-teal-900 mb-2">Settings</h1>
+            <p className="text-sm text-teal-500">Settings page coming soon.</p>
+          </div>
+        ),
+      },
+    ],
   },
 ]);
 
 function App() {
   return (
-    <>
+    <ToastProvider>
       <RouterProvider router={Router} />
-    </>
+    </ToastProvider>
   );
 }
 

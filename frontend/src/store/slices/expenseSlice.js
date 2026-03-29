@@ -123,7 +123,7 @@ const expenseSlice = createSlice({
             .addCase(fetchExpenses.pending, (state) => { state.loading = true; state.error = null; })
             .addCase(fetchExpenses.fulfilled, (state, action) => {
                 state.loading = false;
-                state.expenses = action.payload.expenses ?? action.payload;
+                state.expenses = action.payload?.data?.expenses ?? action.payload?.expenses ?? [];
             })
             .addCase(fetchExpenses.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
 
@@ -131,7 +131,7 @@ const expenseSlice = createSlice({
             .addCase(fetchExpenseById.pending, (state) => { state.loading = true; state.error = null; })
             .addCase(fetchExpenseById.fulfilled, (state, action) => {
                 state.loading = false;
-                state.selectedExpense = action.payload.expense ?? action.payload;
+                state.selectedExpense = action.payload?.data?.expense ?? action.payload?.expense ?? action.payload;
             })
             .addCase(fetchExpenseById.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
 
@@ -139,8 +139,8 @@ const expenseSlice = createSlice({
             .addCase(submitExpense.pending, (state) => { state.loading = true; state.error = null; })
             .addCase(submitExpense.fulfilled, (state, action) => {
                 state.loading = false;
-                const newExpense = action.payload.expense ?? action.payload;
-                state.expenses.unshift(newExpense);
+                const newExpense = action.payload?.data?.expense ?? action.payload?.expense ?? action.payload;
+                if (newExpense) state.expenses.unshift(newExpense);
             })
             .addCase(submitExpense.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
 
@@ -148,7 +148,7 @@ const expenseSlice = createSlice({
             .addCase(approveExpenseThunk.pending, (state) => { state.loading = true; state.error = null; })
             .addCase(approveExpenseThunk.fulfilled, (state, action) => {
                 state.loading = false;
-                updateInList(state, action.payload.expense ?? action.payload);
+                updateInList(state, action.payload?.data?.expense ?? action.payload?.expense ?? action.payload);
             })
             .addCase(approveExpenseThunk.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
 
@@ -156,7 +156,7 @@ const expenseSlice = createSlice({
             .addCase(rejectExpenseThunk.pending, (state) => { state.loading = true; state.error = null; })
             .addCase(rejectExpenseThunk.fulfilled, (state, action) => {
                 state.loading = false;
-                updateInList(state, action.payload.expense ?? action.payload);
+                updateInList(state, action.payload?.data?.expense ?? action.payload?.expense ?? action.payload);
             })
             .addCase(rejectExpenseThunk.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
 
@@ -164,7 +164,7 @@ const expenseSlice = createSlice({
             .addCase(overrideExpenseThunk.pending, (state) => { state.loading = true; state.error = null; })
             .addCase(overrideExpenseThunk.fulfilled, (state, action) => {
                 state.loading = false;
-                updateInList(state, action.payload.expense ?? action.payload);
+                updateInList(state, action.payload?.data?.expense ?? action.payload?.expense ?? action.payload);
             })
             .addCase(overrideExpenseThunk.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
 

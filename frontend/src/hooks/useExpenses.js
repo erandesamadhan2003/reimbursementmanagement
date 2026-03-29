@@ -112,12 +112,13 @@ export const useExpenses = ({ autoFetch = true, statusFilter } = {}) => {
     const clearOcr = () => dispatch(clearOcrData());
 
     // Derived counts
-    const pendingExpenses = expenses.filter((e) => e.status === "pending");
-    const approvedExpenses = expenses.filter((e) => e.status === "approved");
-    const rejectedExpenses = expenses.filter((e) => e.status === "rejected");
+    const safeExpenses = Array.isArray(expenses) ? expenses : [];
+    const pendingExpenses = safeExpenses.filter((e) => e.status === "pending");
+    const approvedExpenses = safeExpenses.filter((e) => e.status === "approved");
+    const rejectedExpenses = safeExpenses.filter((e) => e.status === "rejected");
 
     return {
-        expenses,
+        expenses: safeExpenses,
         selectedExpense,
         pendingExpenses,
         approvedExpenses,
