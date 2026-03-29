@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useExpenses } from "@/hooks/useExpenses";
+import { useAuth } from "@/hooks/useAuth";
 import { OCRUpload } from "@/components/OCRUpload";
 import { toast } from "@/components/ui/Toast";
 import { ArrowLeft, Send } from "lucide-react";
@@ -19,6 +20,7 @@ const categories = [
 
 export const SubmitExpense = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { submit, scanOcr, ocrData, ocrLoading, loading, clearOcr } = useExpenses({ autoFetch: false });
 
   const [formData, setFormData] = useState({
@@ -59,10 +61,27 @@ export const SubmitExpense = () => {
     e.preventDefault();
     if (!validate()) return;
 
+    // Map UI categories to backend ENUM: ['travel', 'food', 'accommodation', 'utilities', 'other']
+    const categoryMap = {
+      "Travel": "travel",
+      "Transportation": "travel",
+      "Meals": "food",
+      "Accommodation": "accommodation",
+      "Office Supplies": "utilities",
+      "Software": "utilities",
+      "Communication": "utilities",
+      "Training": "other",
+      "Miscellaneous": "other"
+    };
+
     try {
       await submit({
-        ...formData,
         amount: parseFloat(formData.amount),
+        currency: user?.company?.currency || "USD",
+        category: categoryMap[formData.category] || "other",
+        date: formData.date,
+        description: formData.title + (formData.description ? ` - ${formData.description}` : ""),
+        // Add receipt_url here in the future if image tracking is active
       });
       toast.success("Expense submitted successfully!");
       clearOcr();
