@@ -1,7 +1,6 @@
 import { googleLogin } from "@/services/auth.service";
 import {
     clearError,
-    clearCredentials,
     getCurrentUser,
     loginUser,
     logoutUser,
@@ -9,32 +8,30 @@ import {
     setCredentials,
     verifyUserToken,
 } from "@/store/slices/authSlice";
-import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 export const useAuth = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const hasCheckedAuth = useRef(false);
 
     const { user, token, loading, error, isAuthenticated } = useSelector(
         (state) => state.auth
     );
 
-    // On mount: if token exists in localStorage but user not in state, re-hydrate
-    useEffect(() => {
-        const storedToken = localStorage.getItem("token");
-        if (storedToken && !user && !hasCheckedAuth.current) {
-            hasCheckedAuth.current = true;
-            dispatch(getCurrentUser());
-        }
-    }, []);
+    // On mount authentication checks have been moved to the App.jsx AuthInit wrapper
+    // to prevent router guard deadlocks.
 
     const register = async (userData) => {
         try {
             const result = await dispatch(registerUser(userData)).unwrap();
-            navigate("/dashboard");
+            if (result.user?.role === "admin") {
+                navigate("/admin");
+            } else if (result.user?.role === "manager") {
+                navigate("/manager");
+            } else {
+                navigate("/dashboard");
+            }
             return result;
         } catch (err) {
             console.error("Registration error:", err);
@@ -45,7 +42,13 @@ export const useAuth = () => {
     const login = async (credentials) => {
         try {
             const result = await dispatch(loginUser(credentials)).unwrap();
-            navigate("/dashboard");
+            if (result.user?.role === "admin") {
+                navigate("/admin");
+            } else if (result.user?.role === "manager") {
+                navigate("/manager");
+            } else {
+                navigate("/dashboard");
+            }
             return result;
         } catch (err) {
             console.error("Login error:", err);
@@ -72,7 +75,15 @@ export const useAuth = () => {
             localStorage.setItem("token", token);
             const result = await dispatch(verifyUserToken(token)).unwrap();
             dispatch(setCredentials({ user: result.user, token }));
-            setTimeout(() => navigate("/dashboard"), 100);
+            setTimeout(() => {
+                if (result.user?.role === "admin") {
+                    navigate("/admin");
+                } else if (result.user?.role === "manager") {
+                    navigate("/manager");
+                } else {
+                    navigate("/dashboard");
+                }
+            }, 100);
             return result;
         } catch (err) {
             navigate("/login");

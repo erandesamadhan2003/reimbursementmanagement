@@ -70,7 +70,9 @@ const userSlice = createSlice({
             .addCase(fetchUsers.pending, (state) => { state.loading = true; state.error = null; })
             .addCase(fetchUsers.fulfilled, (state, action) => {
                 state.loading = false;
-                state.users = action.payload.users ?? action.payload;
+                const p = action.payload;
+                const extracted = p?.data?.users || p?.users || p?.data || p;
+                state.users = Array.isArray(extracted) ? extracted : [];
             })
             .addCase(fetchUsers.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
 
@@ -78,7 +80,8 @@ const userSlice = createSlice({
             .addCase(addUser.pending, (state) => { state.loading = true; state.error = null; })
             .addCase(addUser.fulfilled, (state, action) => {
                 state.loading = false;
-                const newUser = action.payload.user ?? action.payload;
+                const newUser = action.payload?.user ?? action.payload?.data ?? action.payload;
+                if (!Array.isArray(state.users)) state.users = [];
                 state.users.push(newUser);
             })
             .addCase(addUser.rejected, (state, action) => { state.loading = false; state.error = action.payload; })

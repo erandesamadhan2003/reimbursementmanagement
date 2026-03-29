@@ -11,16 +11,34 @@ import {
   LogOut,
   Menu,
   X,
+  Users,
+  BookOpen,
 } from "lucide-react";
 
-const navItems = [
-  { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard", roles: ["employee", "manager", "admin"] },
-  { label: "Submit Expense", icon: PlusCircle, path: "/dashboard/submit", roles: ["employee"] },
-  { label: "My Expenses", icon: Receipt, path: "/dashboard/expenses", roles: ["employee"] },
-  { label: "Approvals", icon: CheckSquare, path: "/dashboard/approvals", roles: ["manager", "admin"] },
-  { label: "Analytics", icon: BarChart3, path: "/dashboard/admin", roles: ["admin"] },
-  { label: "Settings", icon: Settings, path: "/dashboard/settings", roles: ["employee", "manager", "admin"] },
-];
+const NAV_ITEMS = {
+  employee: [
+    { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+    { label: "Submit Expense", icon: PlusCircle, path: "/dashboard/submit" },
+    { label: "My Expenses", icon: Receipt, path: "/dashboard/expenses" },
+    { label: "Settings", icon: Settings, path: "/dashboard/settings" },
+  ],
+  manager: [
+    { label: "Dashboard", icon: LayoutDashboard, path: "/manager" },
+    { label: "Approvals", icon: CheckSquare, path: "/manager/approvals" },
+    { label: "My Team", icon: Users, path: "/manager/team" },
+    { label: "Reports", icon: BarChart3, path: "/manager/reports" },
+    { label: "Settings", icon: Settings, path: "/manager/settings" },
+  ],
+  admin: [
+    { label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
+    { label: "Approvals", icon: CheckSquare, path: "/admin/approvals" },
+    { label: "Users", icon: Users, path: "/admin/users" },
+    { label: "Rules", icon: Settings, path: "/admin/rules" },
+    { label: "Analytics", icon: BarChart3, path: "/admin/analytics" },
+    { label: "Audit Log", icon: BookOpen, path: "/admin/audit" },
+    { label: "Settings", icon: Settings, path: "/admin/settings" },
+  ],
+};
 
 export const Sidebar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -30,20 +48,24 @@ export const Sidebar = () => {
   const { user, logout, isAdmin, isManager } = useAuth();
 
   const userRole = user?.role || "employee";
-  const filteredItems = navItems.filter((item) => item.roles.includes(userRole));
+  const filteredItems = NAV_ITEMS[userRole] || NAV_ITEMS.employee;
 
   const handleNav = (path) => {
     navigate(path);
     setMobileOpen(false);
   };
 
-  const isActive = (path) =>
-    path === "/dashboard"
-      ? location.pathname === "/dashboard"
-      : location.pathname.startsWith(path);
+  const isActive = (path) => {
+    // Exact match for root-level dashboard paths
+    if (path === "/dashboard" || path === "/manager" || path === "/admin") {
+      return location.pathname === path;
+    }
+    return location.pathname.startsWith(path);
+  };
 
   const roleLabel = isAdmin ? "Admin" : isManager ? "Manager" : "Employee";
   const initial = user?.fullName?.charAt(0)?.toUpperCase() || "U";
+
 
   return (
     <>
@@ -68,7 +90,7 @@ export const Sidebar = () => {
           bg-gradient-to-b from-[#0f5c57] to-[#114d49] text-white
           transition-transform duration-300 ease-out
           ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
-          lg:static lg:translate-x-0
+          lg:sticky lg:translate-x-0
         `}
       >
         <div className="flex h-20 items-center justify-between border-b border-white/10 px-6">

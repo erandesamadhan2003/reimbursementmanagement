@@ -63,7 +63,7 @@ const analyticsSlice = createSlice({
             .addCase(fetchAnalyticsSummary.pending, (state) => { state.loading = true; state.error = null; })
             .addCase(fetchAnalyticsSummary.fulfilled, (state, action) => {
                 state.loading = false;
-                state.summary = action.payload.summary ?? action.payload;
+                state.summary = action.payload?.data?.summary ?? action.payload?.summary ?? action.payload;
             })
             .addCase(fetchAnalyticsSummary.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
 
@@ -72,8 +72,9 @@ const analyticsSlice = createSlice({
             .addCase(fetchAnalyticsByCategory.pending, (state) => { state.loading = true; state.error = null; })
             .addCase(fetchAnalyticsByCategory.fulfilled, (state, action) => {
                 state.loading = false;
-                // Backend key is "by_category" (snake_case)
-                state.byCategory = action.payload.by_category ?? action.payload.data ?? action.payload;
+                const p = action.payload;
+                const extracted = p?.data?.by_category || p?.by_category || p?.data?.byCategory || p?.data || p;
+                state.byCategory = Array.isArray(extracted) ? extracted : [];
             })
             .addCase(fetchAnalyticsByCategory.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
 
@@ -82,7 +83,9 @@ const analyticsSlice = createSlice({
             .addCase(fetchAuditLog.pending, (state) => { state.loading = true; state.error = null; })
             .addCase(fetchAuditLog.fulfilled, (state, action) => {
                 state.loading = false;
-                state.auditLog = action.payload.logs ?? action.payload;
+                const p = action.payload;
+                const extracted = p?.data?.logs || p?.logs || p?.data || p;
+                state.auditLog = Array.isArray(extracted) ? extracted : [];
             })
             .addCase(fetchAuditLog.rejected, (state, action) => { state.loading = false; state.error = action.payload; });
     },

@@ -51,12 +51,13 @@ export const useUsers = (autoFetch = true) => {
     const clearError = () => dispatch(clearUserError());
 
     // Derived lists — handy for dropdowns
-    const employees = users.filter((u) => u.role === "employee");
-    const managers = users.filter((u) => u.role === "manager");
-    const managerApprovers = users.filter((u) => u.is_manager_approver);
+    const safeUsers = Array.isArray(users) ? users : [];
+    const employees = safeUsers.filter((u) => u.role === "employee");
+    const managers = safeUsers.filter((u) => u.role === "manager");
+    const managerApprovers = safeUsers.filter((u) => u.is_manager_approver);
 
     return {
-        users,
+        users: safeUsers,
         employees,
         managers,
         managerApprovers,

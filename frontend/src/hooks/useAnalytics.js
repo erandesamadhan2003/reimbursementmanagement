@@ -57,10 +57,13 @@ export const useAnalytics = ({ autoFetch = true, withAudit = false } = {}) => {
             )
             : 0);
 
+    const safeByCategory = Array.isArray(byCategory) ? byCategory : [];
+    const safeAuditLog = Array.isArray(auditLog) ? auditLog : [];
+
     return {
         summary,
-        byCategory,
-        auditLog,
+        byCategory: safeByCategory,
+        auditLog: safeAuditLog,
         approvalRate,
         loading,
         error,

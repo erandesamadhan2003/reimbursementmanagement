@@ -47,8 +47,10 @@ export const useRules = (autoFetch = true) => {
     const refetch = () => dispatch(fetchRules());
     const clearError = () => dispatch(clearRuleError());
 
+    const safeRules = Array.isArray(rules) ? rules : [];
+
     return {
-        rules,
+        rules: safeRules,
         loading,
         error,
         createRule,

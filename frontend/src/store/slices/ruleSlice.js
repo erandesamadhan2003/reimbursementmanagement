@@ -68,7 +68,9 @@ const ruleSlice = createSlice({
             .addCase(fetchRules.pending, (state) => { state.loading = true; state.error = null; })
             .addCase(fetchRules.fulfilled, (state, action) => {
                 state.loading = false;
-                state.rules = action.payload.rules ?? action.payload;
+                const p = action.payload;
+                const extracted = p?.data?.rules || p?.rules || p?.data || p;
+                state.rules = Array.isArray(extracted) ? extracted : [];
             })
             .addCase(fetchRules.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
 
@@ -76,7 +78,9 @@ const ruleSlice = createSlice({
             .addCase(addRule.pending, (state) => { state.loading = true; state.error = null; })
             .addCase(addRule.fulfilled, (state, action) => {
                 state.loading = false;
-                state.rules.push(action.payload.rule ?? action.payload);
+                const newRule = action.payload?.rule ?? action.payload?.data ?? action.payload;
+                if (!Array.isArray(state.rules)) state.rules = [];
+                state.rules.push(newRule);
             })
             .addCase(addRule.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
 

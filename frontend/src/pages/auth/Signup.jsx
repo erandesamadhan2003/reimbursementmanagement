@@ -106,19 +106,7 @@ export const Signup = () => {
             ))}
           </div>
 
-          {/* Social proof */}
-          <div className="mt-10 flex items-center gap-4 px-6 py-4 rounded-2xl bg-gradient-to-br from-white/10 to-transparent border border-white/10 backdrop-blur-xl">
-            <div className="flex -space-x-3">
-              {["A", "B", "C", "D"].map((l, index) => (
-                <div key={l} className="w-9 h-9 rounded-full bg-teal-600 border-2 border-teal-900 flex items-center justify-center text-xs font-bold text-white shadow-md relative z-[${10-index}]">
-                  {l}
-                </div>
-              ))}
-            </div>
-            <p className="text-sm text-teal-200 font-medium">
-              <span className="text-white font-extrabold text-base">2,400+</span> teams trust us
-            </p>
-          </div>
+
         </div>
       </div>
 

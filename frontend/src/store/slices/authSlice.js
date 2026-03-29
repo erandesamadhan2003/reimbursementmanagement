@@ -108,9 +108,9 @@ const authSlice = createSlice({
             .addCase(registerUser.fulfilled, (state, action) => {
                 state.loading = false;
                 state.isAuthenticated = true;
-                state.user = action.payload.user;   // { id, fullName, role, company }
-                state.token = action.payload.token;
-                if (action.payload.token) localStorage.setItem("token", action.payload.token);
+                state.user = action.payload?.user ?? action.payload?.data?.user ?? action.payload?.data ?? action.payload;   // { id, fullName, role, company }
+                state.token = action.payload?.token ?? action.payload?.data?.token ?? state.token;
+                if (state.token) localStorage.setItem("token", state.token);
             })
             .addCase(registerUser.rejected, (state, action) => {
                 state.loading = false;
@@ -126,9 +126,9 @@ const authSlice = createSlice({
             .addCase(loginUser.fulfilled, (state, action) => {
                 state.loading = false;
                 state.isAuthenticated = true;
-                state.user = action.payload.user;   // { id, fullName, role, company }
-                state.token = action.payload.token;
-                if (action.payload.token) localStorage.setItem("token", action.payload.token);
+                state.user = action.payload?.user ?? action.payload?.data?.user ?? action.payload?.data ?? action.payload;   // { id, fullName, role, company }
+                state.token = action.payload?.token ?? action.payload?.data?.token ?? state.token;
+                if (state.token) localStorage.setItem("token", state.token);
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.loading = false;
@@ -154,7 +154,7 @@ const authSlice = createSlice({
             .addCase(verifyUserToken.fulfilled, (state, action) => {
                 state.loading = false;
                 state.isAuthenticated = true;
-                state.user = action.payload.user;
+                state.user = action.payload?.user ?? action.payload?.data?.user ?? action.payload?.data ?? action.payload;
                 state.token = state.token || localStorage.getItem("token");
             })
             .addCase(verifyUserToken.rejected, (state, action) => {
@@ -176,7 +176,7 @@ const authSlice = createSlice({
             .addCase(getCurrentUser.fulfilled, (state, action) => {
                 state.loading = false;
                 state.isAuthenticated = true;
-                state.user = action.payload.user;
+                state.user = action.payload?.user ?? action.payload?.data?.user ?? action.payload?.data ?? action.payload;
             })
             .addCase(getCurrentUser.rejected, (state, action) => {
                 state.loading = false;
