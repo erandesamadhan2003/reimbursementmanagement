@@ -8,6 +8,7 @@ import {
   logout,
 } from '../controllers/auth.controllers.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
+import { changePassword } from '../controllers/auth.controllers.js';
 
 const router = express.Router();
 
@@ -34,6 +35,7 @@ router.get(
 
 // Protected
 router.get('/me', authMiddleware, getMe);
+router.patch('/change-password', authMiddleware, changePassword);
 router.post('/logout', authMiddleware, logout);
 
 export default router;

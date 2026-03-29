@@ -1,7 +1,7 @@
-import jwt from 'jsonwebtoken';
-import { User } from '../models/User.js';
-import { Company } from '../models/Company.js';
-import { getCurrencyForCountry } from '../utils/currency.js';
+import jwt from "jsonwebtoken";
+import { User } from "../models/User.js";
+import { Company } from "../models/Company.js";
+import { getCurrencyForCountry } from "../utils/currency.js";
 
 const generateToken = (user) => {
   return jwt.sign(
@@ -11,7 +11,7 @@ const generateToken = (user) => {
       company_id: user.company_id?.toString?.() ?? user.company_id,
     },
     process.env.JWT_SECRET,
-    { expiresIn: '30d' }
+    { expiresIn: "30d" },
   );
 };
 
@@ -47,7 +47,8 @@ export const signup = async (req, res) => {
     if (!fullName || !email || !password || !companyName || !country) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide fullName, email, password, companyName, and country',
+        message:
+          "Please provide fullName, email, password, companyName, and country",
       });
     }
 
@@ -55,7 +56,7 @@ export const signup = async (req, res) => {
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: 'User already exists with this email',
+        message: "User already exists with this email",
       });
     }
 
@@ -75,23 +76,23 @@ export const signup = async (req, res) => {
       fullName,
       email,
       password,
-      role: 'admin',
-      authProvider: 'local',
+      role: "admin",
+      authProvider: "local",
     });
 
     const token = generateToken(admin);
 
     return res.status(201).json({
       success: true,
-      message: 'Company and admin account created successfully',
+      message: "Company and admin account created successfully",
       token,
       user: userPublic(admin, company),
     });
   } catch (error) {
-    console.error('Signup error:', error);
+    console.error("Signup error:", error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error during signup',
+      message: error.message || "Server error during signup",
     });
   }
 };
@@ -107,25 +108,30 @@ export const login = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide email and password',
+        message: "Please provide email and password",
       });
     }
 
     const user = await User.findOne({ email, is_active: true });
     if (!user) {
-      return res.status(401).json({ success: false, message: 'User not found' });
+      return res
+        .status(401)
+        .json({ success: false, message: "User not found" });
     }
 
-    if (user.authProvider === 'google') {
+    if (user.authProvider === "google") {
       return res.status(400).json({
         success: false,
-        message: 'This email is registered with Google. Please use Google Sign-In',
+        message:
+          "This email is registered with Google. Please use Google Sign-In",
       });
     }
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(401).json({ success: false, message: 'Incorrect password' });
+      return res
+        .status(401)
+        .json({ success: false, message: "Incorrect password" });
     }
 
     const company = user.company_id
@@ -136,15 +142,15 @@ export const login = async (req, res) => {
 
     return res.json({
       success: true,
-      message: 'Login successful',
+      message: "Login successful",
       token,
       user: userPublic(user, company),
     });
   } catch (error) {
-    console.error('Login error:', error);
+    console.error("Login error:", error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error during login',
+      message: error.message || "Server error during login",
     });
   }
 };
@@ -173,13 +179,96 @@ export const getMe = async (req, res) => {
 export const googleCallBack = async (req, res) => {
   const token = generateToken(req.user);
   res.redirect(
-    `${process.env.FRONTEND_URL}/auth/callback?token=${token}&userId=${req.user._id}`
+    `${process.env.FRONTEND_URL}/auth/callback?token=${token}&userId=${req.user._id}`,
   );
+};
+
+export const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide current and new password",
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "New password must be at least 6 characters",
+      });
+    }
+
+    const user = await User.findById(req.user.id).select("+password");
+
+    if (!user || !user.is_active) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (user.authProvider === "google") {
+      return res.status(400).json({
+        success: false,
+        message: "Password change not allowed for Google accounts",
+      });
+    }
+
+    // Verify current password
+    const isMatch = await user.comparePassword(currentPassword);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Current password is incorrect",
+      });
+    }
+
+    // Prevent same password reuse
+    const isSame = await user.comparePassword(newPassword);
+    if (isSame) {
+      return res.status(400).json({
+        success: false,
+        message: "New password cannot be same as current password",
+      });
+    }
+
+    // Update password (auto-hashed via pre-save hook)
+    user.password = newPassword;
+    await user.save();
+
+    // Safe user response (no password)
+    const userSafe = {
+      id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      role: user.role,
+      company_id: user.company_id,
+      manager_id: user.manager_id,
+      is_manager_approver: user.is_manager_approver,
+      authProvider: user.authProvider,
+      profilePicture: user.profilePicture,
+    };
+
+    return res.json({
+      success: true,
+      message: "Password updated successfully",
+      user: userSafe,
+    });
+  } catch (error) {
+    console.error("Change password error:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Server error",
+    });
+  }
 };
 
 /**
  * POST /api/auth/logout
  */
 export const logout = async (req, res) => {
-  return res.json({ success: true, message: 'Logout successful' });
+  return res.json({ success: true, message: "Logout successful" });
 };
