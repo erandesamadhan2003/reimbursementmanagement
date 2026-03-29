@@ -1,69 +1,95 @@
 import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import session from 'express-session';
 import passport from 'passport';
+
 import connectDB from './config/db.js';
-import authRoutes from './routes/auth.routes.js';
 import { configurePassport } from './config/passport.js';
 
-dotenv.config();
+import authRoutes from './routes/auth.routes.js';
+import userRoutes from './routes/user.routes.js';
+import expenseRoutes from './routes/expense.routes.js';
+import ruleRoutes from './routes/rule.routes.js';
+import analyticsRoutes from './routes/analytics.routes.js';
+import auditRoutes from './routes/audit.routes.js';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(__dirname, '.env') });
 connectDB();
 
 const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+// ─── Body Parsing ────────────────────────────────────────────────────────────
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 
-app.use(cors({
-  origin: process.env.FRONTEND_URL,
-  credentials: true
-}));
+// ─── CORS ─────────────────────────────────────────────────────────────────────
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  })
+);
 
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }
-}));
+// ─── Session (required for Passport) ─────────────────────────────────────────
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 24 * 60 * 60 * 1000,
+    },
+  })
+);
 
+// ─── Passport ─────────────────────────────────────────────────────────────────
 app.use(passport.initialize());
 app.use(passport.session());
+configurePassport();
 
-configurePassport(passport);
-
+// ─── Routes ───────────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/expenses', expenseRoutes);
+app.use('/api/rules', ruleRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/audit', auditRoutes);
 
-app.get('/', (req, res) => {
-  res.json({
-    message: '🚀 Authentication Server is running',
-    endpoints: {
-      register: 'POST /api/auth/register',
-      login: 'POST /api/auth/login',
-      googleAuth: 'GET /api/auth/google',
-      getMe: 'GET /api/auth/me',
-      logout: 'POST /api/auth/logout'
-    }
-  });
+// ─── Health Check ─────────────────────────────────────────────────────────────
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// ─── 404 ──────────────────────────────────────────────────────────────────────
+app.use((req, res) => {
+  res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found` });
+});
+
+// ─── Global Error Handler ─────────────────────────────────────────────────────
 app.use((err, req, res, next) => {
-  console.error('❌ Error:', err.stack);
-  res.status(500).json({
+  console.error('❌ Unhandled error:', err.stack);
+
+  // Multer errors
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({ success: false, message: 'File too large (max 10MB)' });
+  }
+
+  res.status(err.status || 500).json({
     success: false,
-    message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    message: err.message || 'Internal server error',
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
   });
 });
 
-const PORT = process.env.PORT || 5000;
-
+// ─── Start ────────────────────────────────────────────────────────────────────
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Frontend URL: ${process.env.FRONTEND_URL}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
+
+export default app;

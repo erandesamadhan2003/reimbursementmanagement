@@ -6,4 +6,8 @@ logs/
 coverage/
 .DS_Store
 .idea/
-.vscode/    
+.vscode/
+
+# local docs & scripts
+info.md
+scripts/

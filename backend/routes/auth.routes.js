@@ -1,18 +1,39 @@
 import express from 'express';
-import { getProfile, googleCallBack, login, logout, register } from '../controllers/auth.controllers.js';
 import passport from 'passport';
+import {
+  signup,
+  login,
+  getMe,
+  googleCallBack,
+  logout,
+} from '../controllers/auth.controllers.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
-router.post('/register', register);
+// Public
+router.post('/signup', signup);
 router.post('/login', login);
-router.get('/google', passport.authenticate('google', {
+
+// Google OAuth
+router.get(
+  '/google',
+  passport.authenticate('google', {
     scope: ['profile', 'email'],
-    prompt: 'select_account'  
-}));
-router.get('/google/callback', passport.authenticate('google', { failureRedirect: `${process.env.FRONTEND_URL}/login`, session: false }), googleCallBack);
-router.get('/profile', authMiddleware, getProfile);
+    prompt: 'select_account',
+  })
+);
+router.get(
+  '/google/callback',
+  passport.authenticate('google', {
+    failureRedirect: `${process.env.FRONTEND_URL}/login`,
+    session: false,
+  }),
+  googleCallBack
+);
+
+// Protected
+router.get('/me', authMiddleware, getMe);
 router.post('/logout', authMiddleware, logout);
 
 export default router;
