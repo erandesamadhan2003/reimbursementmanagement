@@ -1,5 +1,6 @@
 import { User } from '../models/User.js';
 import { AuditLog } from '../models/AuditLog.js';
+import bcrypt from 'bcryptjs';
 
 /**
  * POST /api/users
@@ -167,7 +168,7 @@ export const updateUser = async (req, res) => {
     return res.json({
       success: true,
       message: 'User updated successfully',
-      data: { user: sanitizeUser(targetUser) },
+      user: sanitizeUser(targetUser),
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
@@ -208,11 +209,7 @@ export const deleteUser = async (req, res) => {
       meta: { email: targetUser.email },
     });
 
-    return res.json({
-      success: true,
-      message: 'User deactivated successfully',
-      data: { user: sanitizeUser(targetUser) },
-    });
+    return res.json({ success: true, message: 'User deactivated successfully' });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
