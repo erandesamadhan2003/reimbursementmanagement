@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  frontend: 
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: always
+
+  backend:
+    build: ./backend
+    container_name: backend
+    expose: 
+      - "3000"
+    env_file:
+      - ./backend/.env
+    restart: always
+
+    healthcheck:
+      test: ["CMD", "curl", "-r", "-f", "http://localhost/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3  

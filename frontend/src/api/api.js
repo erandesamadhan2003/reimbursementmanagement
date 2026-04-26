@@ -1,18 +1,12 @@
 import axios from "axios";
 
-export const BASE_URL = "http://localhost:3000/api";
+export const BASE_URL = "/api";
 
 export const AUTH_URL = {
-    // POST /api/auth/signup  → creates Company + Admin, returns { success, token, user }
     REGISTER: `/auth/signup`,
-    // POST /api/auth/login   → returns { success, token, user }
     LOGIN: `/auth/login`,
-    // GET  /api/auth/google  → redirects to Google OAuth consent
     GOOGLE_AUTH: `/auth/google`,
-    // GET  /api/auth/me      → returns current user + company from JWT
     GET_PROFILE: `/auth/me`,
-    // No server-side logout endpoint — JWT is stateless; logout is client-side only
-    // (remove token from localStorage + clear Redux state)
 };
 
 export const USER_URL = {
